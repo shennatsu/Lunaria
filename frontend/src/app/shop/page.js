@@ -39,104 +39,120 @@ const flowers = [
 
 
 export default function ShopPage() {
-    const [selectedSeason, setSelectedSeason] = useState("Spring");
-    const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSeason, setSelectedSeason] = useState("Spring");
+  const [searchTerm, setSearchTerm] = useState("");
 
-    const filteredFlowers = flowers.filter(
-        (flower) =>
-            flower.season === selectedSeason &&
-            flower.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  const filteredFlowers = flowers.filter(
+    (flower) =>
+      flower.season === selectedSeason &&
+      flower.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-    return (
-        <main className="p-8">
-            <section className="">
-                <h1>Lunaria</h1>
-                <Image
-                    src="/flower-header.svg"
-                    alt="flower header"
-                    width={1200}
-                    height={400}
-                />
-                <button>COLLECTIONS</button>
-            </section>
-                <div className="flex justify-center gap-4 mb-8">
-        {["Spring", "Summer", "Autumn", "Winter"].map((season) => (
-          <button
-            key={season}
-            onClick={() => setSelectedSeason(season)}
-            className={`px-6 py-2 rounded-full font-semibold transition-all ${
-              selectedSeason === season
-                ? {
-                    Spring: "bg-pink-300 text-white",
-                    Summer: "bg-yellow-400 text-white",
-                    Autumn: "bg-orange-400 text-white",
-                    Winter: "bg-blue-400 text-white",
-                  }[season]
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            {season}
-          </button>
-        ))}
-      </div>
+  const seasonColors = {
+    Spring: {
+      bg: "bg-pink-300",
+      card: "from-pink-50 to-white",
+      button: "bg-pink-400",
+    },
+    Summer: {
+      bg: "bg-yellow-400",
+      card: "from-yellow-50 to-white",
+      button: "bg-yellow-400",
+    },
+    Autumn: {
+      bg: "bg-orange-400",
+      card: "from-orange-50 to-white",
+      button: "bg-orange-400",
+    },
+    Winter: {
+      bg: "bg-blue-400",
+      card: "from-blue-50 to-white",
+      button: "bg-blue-400",
+    },
+  };
 
-      {/* 🔍 Filter dan Search */}
-      <div className="flex justify-center gap-4 mb-10">
-        <select className="border rounded-md px-3 py-2 shadow-sm">
-          <option>Filter</option>
-          <option>Harga kurang dari 20000</option>
-          <option>Harga kurang dari 20000</option>
-        </select>
+  return (
+    <main className="p-8">
+      <section className="">
+        <h1>Lunaria</h1>
+          <Image
+              src="/flower-header.svg"
+              alt="flower header"
+              width={1200}
+              height={400}
+          />
+          <button>COLLECTIONS</button>
+      </section>
 
-        <input
-          type="text"
-          placeholder="Find your flower..."
-          className="w-64 border rounded-md px-4 py-2 shadow-sm"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+      <section>
+        <div className="flex justify-center gap-4 mb-8">
+          {["Spring", "Summer", "Autumn", "Winter"].map((season) => {
+            const isActive = selectedSeason === season;
+            return (
+              <button
+                key={season}
+                onClick={() => setSelectedSeason(season)}
+                className={`px-6 py-2 rounded-full font-semibold transition-all ${
+                  isActive
+                    ? `${seasonColors[season].bg} text-white`
+                    : "bg-gray-200 text-gray-700"
+                }`}
+              >
+                {season}
+              </button>
+            );
+          })}
+        </div>
 
-      {/* 💐 Kartu Bunga */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 justify-items-center">
-        {filteredFlowers.map((flower) => (
-          <div
-            key={flower.id}
-            className={`p-4 rounded-xl shadow-lg text-center transition-all w-56 ${
-              {
-                Spring: "bg-gradient-to-b from-pink-50 to-white",
-                Summer: "bg-gradient-to-b from-yellow-50 to-white",
-                Autumn: "bg-gradient-to-b from-orange-50 to-white",
-                Winter: "bg-gradient-to-b from-blue-50 to-white",
-              }[selectedSeason]
-            }`}
-          >
-            <Image
-              src={flower.image}
-              alt={flower.name}
-              width={150}
-              height={150}
-              className="mx-auto rounded-lg mb-3"
-            />
-            <h2 className="font-serif text-xl">{flower.name}</h2>
-            <p className="text-sm text-gray-600 mb-3">{flower.meaning}</p>
-            <button
-              className={`px-4 py-2 text-white rounded-lg ${
+        {/* 🔍 Filter dan Search */}
+        <div className="flex justify-center gap-4 mb-10">
+          <select className="border rounded-md px-3 py-2 shadow-sm">
+            <option>Filter</option>
+            <option>Harga kurang dari 20000</option>
+            <option>Harga kurang dari 20000</option>
+          </select>
+
+          <input
+            type="text"
+            placeholder="Find your flower..."
+            className="w-64 border rounded-md px-4 py-2 shadow-sm"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        {/* 💐 Kartu Bunga */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 justify-items-center">
+          {filteredFlowers.map((flower) => (
+            <div
+              key={flower.id}
+              className={`p-4 rounded-xl shadow-lg text-center transition-all w-56 ${
                 {
-                  Spring: "bg-pink-400",
-                  Summer: "bg-yellow-400",
-                  Autumn: "bg-orange-400",
-                  Winter: "bg-blue-400",
+                  Spring: "bg-gradient-to-b from-pink-50 to-white",
+                  Summer: "bg-gradient-to-b from-yellow-50 to-white",
+                  Autumn: "bg-gradient-to-b from-orange-50 to-white",
+                  Winter: "bg-gradient-to-b from-blue-50 to-white",
                 }[selectedSeason]
               }`}
             >
-              Rp {flower.price.toLocaleString()}
-            </button>
-          </div>
-        ))}
-      </div>
-            <section></section>
-        </main>
-    );
+              <Image
+                src={flower.image}
+                alt={flower.name}
+                width={150}
+                height={150}
+                className="mx-auto rounded-lg mb-3"
+              />
+              <h2 className="font-serif text-xl">{flower.name}</h2>
+              <p className="text-sm text-gray-600 mb-3">{flower.meaning}</p>
+              <button
+                className={`px-4 py-2 text-white rounded-lg ${seasonColors[selectedSeason].button}`}
+              >
+                Rp {flower.price.toLocaleString()}
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
 }
