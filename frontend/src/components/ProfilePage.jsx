@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { User, Phone, MapPin, Save, LogOut, Calendar, ChevronDown, ChevronUp, Package } from 'lucide-react';
 
 
@@ -55,9 +55,48 @@ export default function ProfilePage() {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert('Perubahan berhasil disimpan!');
+  
+  // 🔹 Ambil data dari backend saat halaman dibuka
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/profile/1761040079213");
+        if (!res.ok) throw new Error('Gagal mengambil data profil');
+        const data = await res.json();
+        setFormData({
+          username: data.username || '',
+          phone: data.phone || '',
+          address: data.address || ''
+        });
+      } catch (err) {
+        console.error("❌ Error saat fetch profil:", err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleSubmit = async (e) => {
+     e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:5000/api/profile/1761040079213", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gagal update: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("✅ Response dari backend:", data);
+    alert("Profil berhasil diperbarui!");
+  } catch (err) {
+    console.error("❌ Error saat update profil:", err);
+    alert("Gagal memperbarui profil!");
+  }
   };
 
   const getStatusColor = (status) => {
