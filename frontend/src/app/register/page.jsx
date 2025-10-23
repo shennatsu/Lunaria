@@ -17,11 +17,30 @@ export default function RegisterPage() {
     password: ''
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`Pendaftaran berhasil!\n\nUsername: ${formData.username}\nEmail: ${formData.email}`);
-    setFormData({ username: '', email: '', password: '' });
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await fetch('http://localhost:5000/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message || 'Gagal mendaftar');
+    } else {
+      alert(` ${data.message}\n\nUsername: ${data.user.username}\nEmail: ${data.user.email}`);
+      setFormData({ username: '', email: '', password: '' });
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Terjadi kesalahan pada server.');
+  }
+};
+
 
   const handleChange = (e) => {
     setFormData({
