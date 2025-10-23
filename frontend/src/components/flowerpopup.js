@@ -220,8 +220,8 @@ export default function FlowerPopup({
           onClose={() => setShowPayment(false)}
           onConfirm={() => {
             setShowPayment(false);
-            onClose(); // Tutup popup bunga juga setelah pembayaran selesai
-            alert("Payment successful! 🎉");
+            onClose();
+            alert("Payment successful!");
           }}
         />
       )}
