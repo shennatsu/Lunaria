@@ -165,7 +165,7 @@ export default function ShopPage() {
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
             >
-              <option value="">Urutkan</option>
+              <option value="">Sort</option>
               <option value="harga-asc">Harga Termurah</option>
               <option value="harga-desc">Harga Termahal</option>
               <option value="umur-asc">Umur Tahan Terpendek</option>
@@ -177,7 +177,7 @@ export default function ShopPage() {
               value={availabilityFilter}
               onChange={(e) => setAvailabilityFilter(e.target.value)}
             >
-              <option value="all">Semua</option>
+              <option value="all">All</option>
               <option value="available">Tersedia</option>
               <option value="unavailable">Tidak Tersedia</option>
             </select>
