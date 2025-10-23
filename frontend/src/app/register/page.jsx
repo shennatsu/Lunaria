@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image'; 
 import { DM_Sans } from 'next/font/google';
 
 const dmSans = DM_Sans({

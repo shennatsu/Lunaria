@@ -5,13 +5,12 @@ import { HiX } from 'react-icons/hi'
 // Tanda 'type' sudah dihapus
 export function MobileMenu({ isOpen, setMenuOpen, activeSection }) {
   return (
-    // Overlay (latar belakang gelap)
     <div
       className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden
         transition-opacity duration-300
         ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
       `}
-      onClick={() => setMenuOpen(false)} // Tutup menu jika klik di luar
+      onClick={() => setMenuOpen(false)} 
     >
       {/* Panel Menu (yang slide dari kiri) */}
       <div
@@ -19,7 +18,7 @@ export function MobileMenu({ isOpen, setMenuOpen, activeSection }) {
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
-        onClick={(e) => e.stopPropagation()} // Jangan tutup menu jika klik di dalam
+        onClick={(e) => e.stopPropagation()} 
       >
         {/* Header Menu (Tombol Close) */}
         <div className="flex justify-end p-6">
@@ -44,6 +43,15 @@ export function MobileMenu({ isOpen, setMenuOpen, activeSection }) {
             onClick={() => setMenuOpen(false)}
           >
             Postcard
+          </a>
+         <a
+            href="#contact-section"
+            className={`font-dm font-semibold text-2xl ${
+              activeSection === 'contact' ? 'text-black' : 'text-black/60'
+            }`}
+            onClick={() => setMenuOpen(false)}
+          >
+            Contact
           </a>
         </nav>
       </div>

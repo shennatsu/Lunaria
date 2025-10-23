@@ -5,25 +5,37 @@ import { useState, useEffect } from 'react'
 import { Header } from './components/Header'
 import { MobileMenu } from './components/MobileMenu'
 import { PostcardScroller } from './components/Scroller'
+import { Footer } from './components/Footer'
 
 // ----- HALAMAN UTAMA -----
 export default function Home() {
   const [isMenuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
 
+// app/page.js
+
+  // EFFECT BARU UNTUK MENDETEKSI SCROLL
   useEffect(() => {
     const handleScroll = () => {
       const homeSection = document.getElementById('home-section')
       const postcardSection = document.getElementById('postcard-section')
+      const contactSection = document.getElementById('contact-section')
+      
+      // Offset standar
+      const scrollPosition = window.scrollY + 120 
+      
+      // === INI PERBAIKANNYA ===
+      // Cek apa kita sudah di paling bawah (toleransi 20px)
+      const atBottom = window.scrollY + window.innerHeight >= document.body.offsetHeight - 20;
 
-      const scrollPosition = window.scrollY + 150
-
-      if (postcardSection && scrollPosition >= postcardSection.offsetTop) {
-        setActiveSection('postcard')
+      if (atBottom && contactSection) {
+        setActiveSection('contact');
+      } else if (postcardSection && scrollPosition >= postcardSection.offsetTop) {
+        setActiveSection('postcard');
       } else if (homeSection && scrollPosition >= homeSection.offsetTop) {
-        setActiveSection('home')
+        setActiveSection('home');
       } else {
-        setActiveSection('home')
+        setActiveSection('home');
       }
     }
 
@@ -33,9 +45,10 @@ export default function Home() {
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [])
-
+  }, []) 
+  
   return (
+    <>
     <main
       className={`relative min-h-screen overflow-x-hidden
         ${isMenuOpen ? 'overflow-hidden' : ''}
@@ -86,7 +99,7 @@ export default function Home() {
             Our Product
           </button>
           <button className="px-10 py-3 text-base bg-button-bg rounded-2xl text-black">
-            About us
+            Our Contact
           </button>
         </div>
       </section>
@@ -94,11 +107,14 @@ export default function Home() {
       {/* Scroller Section */}
       <section
         id="postcard-section"
-        className="relative flex flex-col gap-8 mt-24 lg:mt-32 py-10 scroll-m-32 lg:scroll-m-40"
+        className="relative flex flex-col gap-8 mt-40 lg:mt-48 py-10 scroll-m-12 lg:scroll-m-16"
       >
         <PostcardScroller direction="left" />
         <PostcardScroller direction="right" />
       </section>
     </main>
+  <Footer />
+  </>
+
   )
 }

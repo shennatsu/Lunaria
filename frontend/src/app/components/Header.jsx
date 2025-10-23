@@ -3,10 +3,9 @@ import { BsCart, BsPerson } from 'react-icons/bs'
 import { HiOutlineMenu } from 'react-icons/hi'
 
 // ----- KOMPONEN HEADER / NAVBAR -----
-// Tanda 'type' sudah dihapus
 export function Header({ setMenuOpen, activeSection }) {
   return (
-    <header className="fixed top-0 left-0 lg:top-6 lg:left-1/2 lg:-translate-x-1/2 z-30 w-full max-w-6xl px-4 pt-6 lg:pt-0 bg-page-bg/90 backdrop-blur-md shadow-sm lg:bg-transparent lg:backdrop-blur-none lg:shadow-none">
+    <header className="fixed top-0 left-0 lg:top-6 lg:left-1/2 lg:-translate-x-1/2 z-30 w-full max-w-6xl px-4 pt-6 lg:pt-0 lg:bg-transparent lg:backdrop-blur-none lg:shadow-none">
       <nav className="flex items-center w-full">
         {/* --- TAMPILAN DESKTOP (lg: ke atas) --- */}
         <div className="hidden lg:flex items-center justify-center gap-12 px-20 py-5 rounded-full shadow-lg bg-white/30 backdrop-blur-md">
@@ -33,8 +32,10 @@ export function Header({ setMenuOpen, activeSection }) {
             Postcard
           </a>
           <a
-            href="#"
-            className="font-dm font-semibold text-lg text-black/40"
+            href="#contact-section"
+            className={`font-dm font-semibold text-lg ${
+            activeSection === 'contact' ? 'text-black' : 'text-black/40'
+            }`}
           >
             Contact
           </a>
