@@ -86,13 +86,13 @@ const handleSubmit = async (e) => {
 
         {/* Form Section */}
         <div className="flex-1 px-20 py-14 flex flex-col justify-center bg-white">
-          <h1 className="text-center text-4xl font-bold text-gray-800 mb-2">Create Account</h1>
-          <p className="text-center text-gray-500 mb-8 text-sm">Fill in your information to create an account</p>
+          <h1 className="text-center text-4xl  font-dm font-bold text-gray-800 mb-2">Create Account</h1>
+          <p className="text-center text-gray-500 mb-8 text-sm  font-dm">Fill in your information to create an account</p>
 
           <form onSubmit={handleSubmit}>
             {/* Username */}
             <div className="mb-5">
-              <label htmlFor="username" className="block mb-2 text-gray-600 font-medium text-sm">
+              <label htmlFor="username" className="block mb-2 text-gray-600  font-dm font-medium text-sm">
                 Username
               </label>
               <input
@@ -109,7 +109,7 @@ const handleSubmit = async (e) => {
 
             {/* Email */}
             <div className="mb-5">
-              <label htmlFor="email" className="block mb-2 text-gray-600 font-medium text-sm">
+              <label htmlFor="email" className="block mb-2 text-gray-600  font-dm font-medium text-sm">
                 Email Address
               </label>
               <input
@@ -126,7 +126,7 @@ const handleSubmit = async (e) => {
 
             {/* Password */}
             <div className="mb-5 relative">
-              <label htmlFor="password" className="block mb-2 text-gray-600 font-medium text-sm">
+              <label htmlFor="password" className="block mb-2 text-gray-600  font-dm font-medium text-sm">
                 Password
               </label>
               <input
@@ -150,7 +150,7 @@ const handleSubmit = async (e) => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-4 mt-4 bg-gradient-to-r from-[#c6c1e9]  to-[#C9B2DB] text-white rounded-xl font-semibold text-lg transition-all duration-300 shadow-lg shadow-purple-300/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-300/50 hover:from-purple-400 hover:to-purple-500 active:translate-y-0"
+              className="w-full py-4 mt-4 bg-gradient-to-r from-[#c6c1e9]  to-[#C9B2DB] text-white rounded-xl  font-dm font-semibold text-lg transition-all duration-300 shadow-lg shadow-purple-300/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-300/50 hover:from-purple-400 hover:to-purple-500 active:translate-y-0"
             >
               Create Account
             </button>
@@ -164,9 +164,9 @@ const handleSubmit = async (e) => {
 
 
           {/* Login Link */}
-          <p className="text-center mt-6 text-gray-600 text-sm">
+          <p className="text-center mt-6 text-gray-600 text-sm  font-dm ">
             Have an account?{' '}
-            <a href="/login" className="text-[#664b7b] font-semibold hover:text-green-500 hover:underline transition-colors">
+            <a href="/login" className="text-[#664b7b] font-dm font-semibold hover:text-green-500 hover:underline transition-colors">
               Log In
             </a>
           </p>

@@ -55,7 +55,11 @@ export default function ProfilePage() {
     });
   };
 
-  
+  const handleLogout = () => {
+  localStorage.removeItem('token'); 
+  window.location.href = '/login';
+};
+
   // 🔹 Ambil data dari backend saat halaman dibuka
   useEffect(() => {
     const fetchProfile = async () => {
@@ -123,7 +127,9 @@ export default function ProfilePage() {
               <p className="text-gray-600">Kelola informasi dan riwayat pesanan Anda</p>
             </div>
           </div>
-          <button className="px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 hover:border-pink-300 transition-all duration-300 flex items-center gap-2 shadow-md">
+          <button 
+          onClick={handleLogout}
+          className="px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 hover:border-pink-300 transition-all duration-300 flex items-center gap-2 shadow-md">
              <LogOut className="w-5 h-5" />
             Logout
           </button>
