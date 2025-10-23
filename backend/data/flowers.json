@@ -22,5 +22,17 @@
     "otherImages": ["/sunflower2.svg", "/sunflower3.svg"],
     "rekomendasi_perpaduan": ["Lily"],
     "status_tersedia": true
+  },
+  {
+    "id": 3,
+    "name": "Daisy",
+    "meaning": "happiness; positivity; warmth; loyalty",
+    "price": 20000,
+    "season": "Spring",
+    "umur_tahan": 10,
+    "image": "/daisy.svg",
+    "otherImages": ["/daisy2.svg", "/daisy3.svg"],
+    "rekomendasi_perpaduan": ["Lily"],
+    "status_tersedia": true
   }
 ]
