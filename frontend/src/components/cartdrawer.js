@@ -1,9 +1,19 @@
 "use client";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { X, Trash2 } from "lucide-react";
+import PaymentPopup from "./paymentpopup";
+import { DM_Sans } from "next/font/google";
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-dm",
+});
 
 export default function CartDrawer({ cartItems, onClose, onUpdateQty, onRemove }) {
+  const [showPayment, setShowPayment] = useState(false);
+
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
   const shipping = 5000;
   const total = subtotal + shipping;
@@ -15,7 +25,7 @@ export default function CartDrawer({ cartItems, onClose, onUpdateQty, onRemove }
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm">
+    <div className={`${dmSans.className} fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm`}>
       <div className="bg-white w-full sm:w-[420px] h-full flex flex-col shadow-xl animate-slide-in">
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b">
@@ -40,7 +50,8 @@ export default function CartDrawer({ cartItems, onClose, onUpdateQty, onRemove }
                   className="rounded-md object-cover"
                 />
                 <div className="flex-1">
-                  <p className="font-semibold">{item.name}</p>
+                  {/* Nama bunga pakai font serif */}
+                  <p className="font-serif text-base font-semibold">{item.name}</p>
                   <p className="text-sm text-gray-600">{item.meaning.split(";")[0]}</p>
 
                   <div className="flex items-center gap-2 mt-1">
@@ -61,7 +72,9 @@ export default function CartDrawer({ cartItems, onClose, onUpdateQty, onRemove }
                 </div>
 
                 <div className="text-right">
-                  <p className="font-medium">Rp {(item.price * item.qty).toLocaleString("id-ID")}</p>
+                  <p className="font-medium">
+                    Rp {(item.price * item.qty).toLocaleString("id-ID")}
+                  </p>
                   <button
                     onClick={() => onRemove(item.id)}
                     className="text-gray-400 hover:text-red-600 mt-1"
@@ -89,11 +102,37 @@ export default function CartDrawer({ cartItems, onClose, onUpdateQty, onRemove }
             <p>Rp {total.toLocaleString("id-ID")}</p>
           </div>
 
-          <button className="w-full mt-2 bg-gradient-to-r from-[#987772] to-[#451900] text-white py-2 rounded-lg shadow hover:opacity-90">
-            Checkout
+          <button
+            onClick={() => setShowPayment(true)}
+            className="group w-full mt-3 relative overflow-hidden rounded-lg 
+                        bg-gradient-to-r from-[#987772] to-[#451900]
+                        text-white py-3 font-semibold tracking-wide shadow-md transition-all duration-300 
+                        hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              Checkout
+            </span>
+
+            {/* Efek cahaya lembut saat hover */}
+            <span className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/20 to-white/5 
+                            translate-x-[-100%] group-hover:translate-x-[100%] 
+                            transition-transform duration-700 ease-in-out rounded-lg" />
           </button>
+
         </div>
       </div>
+
+      {showPayment && (
+        <PaymentPopup
+          total={total}
+          onClose={() => setShowPayment(false)}
+          onConfirm={() => {
+            alert("Payment successful!");
+            setShowPayment(false);
+            onClose();
+          }}
+        />
+      )}
     </div>
   );
 }
