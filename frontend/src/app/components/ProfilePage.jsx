@@ -56,8 +56,8 @@ export default function ProfilePage() {
   };
 
   const handleLogout = () => {
-  localStorage.removeItem('token'); 
-  window.location.href = '/login';
+  localStorage.removeItem('user'); 
+  window.location.href = '/';
 };
 
   // 🔹 Ambil data dari backend saat halaman dibuka

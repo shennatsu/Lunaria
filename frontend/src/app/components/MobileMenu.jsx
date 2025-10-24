@@ -14,7 +14,7 @@ export function MobileMenu({ isOpen, setMenuOpen, activeSection }) {
     >
       {/* Panel Menu (yang slide dari kiri) */}
       <div
-        className={`fixed top-0 left-0 h-full w-72 bg-page-bg shadow-2xl
+        className={`fixed top-0 left-0 h-full w-72 bg-page-bg shadow-2xl z-50
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
@@ -36,7 +36,7 @@ export function MobileMenu({ isOpen, setMenuOpen, activeSection }) {
             Shop
           </a>
           <a
-            href="#postcard-section"
+            href="#postcard"
             className={`font-dm font-semibold text-2xl ${
               activeSection === 'postcard' ? 'text-black' : 'text-black/60'
             }`}
@@ -45,7 +45,7 @@ export function MobileMenu({ isOpen, setMenuOpen, activeSection }) {
             Postcard
           </a>
          <a
-            href="#contact-section"
+            href="#contact"
             className={`font-dm font-semibold text-2xl ${
               activeSection === 'contact' ? 'text-black' : 'text-black/60'
             }`}

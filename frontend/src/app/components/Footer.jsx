@@ -1,11 +1,21 @@
 // src/app/components/Footer.js
-import { BsInstagram, BsPinterest, BsTwitter } from 'react-icons/bs'
-import Image from 'next/image'
+"use client"; // Tambahkan ini karena kita pakai hook
+
+import { useState, useEffect } from 'react'; // <-- Import hook
+import { BsInstagram, BsPinterest, BsTwitter } from 'react-icons/bs';
+import Image from 'next/image';
 
 export function Footer() {
-  return (
+  // State untuk menyimpan tahun, awalnya kosong
+  const [currentYear, setCurrentYear] = useState('');
+
+  // Effect untuk set tahun HANYA di client setelah mount
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+     }, []);   
+    return (
     <footer
-      id="contact-section"
+      id="contact"
       // overflow-hidden SANGAT PENTING di sini
       className="relative w-full py-20 px-6 bg-transparent mt-40 scroll-m-32 lg:scroll-m-40 overflow-hidden"
     >
@@ -38,16 +48,16 @@ export function Footer() {
 
         {/* 2. Nav Links */}
         <nav className="flex flex-wrap justify-center gap-x-8 gap-y-2 font-dm text-base text-black/80">
-          <a href="#home-section" className="hover:text-black transition-colors">
+          <a href="#home" className="hover:text-black transition-colors">
             Home
           </a>
           <a href="#" className="hover:text-black transition-colors">
             Shop
           </a>
-          <a href="#postcard-section" className="hover:text-black transition-colors">
+          <a href="#postcard" className="hover:text-black transition-colors">
             Postcard
           </a>
-          <a href="#contact-section" className="hover:text-black transition-colors">
+          <a href="#contact" className="hover:text-black transition-colors">
             Contact
           </a>
         </nav>

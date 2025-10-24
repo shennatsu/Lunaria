@@ -92,7 +92,7 @@ export default function LoginPage() {
         // Redirect ke profile atau home setelah 2 detik
         setTimeout(() => {
           // router.push('/profile'); // Diganti dengan API web standar
-          window.location.assign('/profile');
+          window.location.assign('/');
         }, 2000);
       }
     } catch (err) {
