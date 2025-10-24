@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import Select from "react-select";
 import Image from "next/image";
-import { Header } from "../../components/Header";
-import FlowerPopup from "../../components/flowerpopup";
-import CartDrawer from "../../components/cartdrawer";
+import { Header } from "../components/Header";
+import FlowerPopup from "../components/flowerpopup";
+import CartDrawer from "../components/cartdrawer";
 import { DM_Sans, Libre_Caslon_Display } from "next/font/google";
 
 const dmSans = DM_Sans({
@@ -47,6 +47,21 @@ export default function ShopPage() {
   const [error, setError] = useState(null);
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setCartOpen] = useState(false);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const cartKey = user ? `cart_${user.email}` : "cart_guest";
+
+    const saved = localStorage.getItem(cartKey);
+    if (saved) setCartItems(JSON.parse(saved));
+  }, []);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const cartKey = user ? `cart_${user.email}` : "cart_guest";
+
+    localStorage.setItem(cartKey, JSON.stringify(cartItems));
+  }, [cartItems]);
 
   // Tambah ke keranjang
   const handleAddToCart = (flower) => {
@@ -92,7 +107,43 @@ export default function ShopPage() {
     fetchFlowers();
   }, []);
 
-  if (loading) return <p className="text-center mt-10">Loading flowers...</p>;
+  if (loading)
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#FFF7FC] to-[#FCE4EC] relative overflow-hidden">
+      {/* Background Bunga Lembut */}
+      <div className="absolute inset-0 opacity-30">
+        <Image
+          src="/lily.png"
+          alt="background flowers"
+          fill
+          className="object-cover blur-sm scale-105"
+          priority
+        />
+      </div>
+
+      {/* Logo / Judul */}
+      <h1 className="relative z-10 font-caslon text-6xl sm:text-7xl text-[#451900] tracking-widest drop-shadow-lg">
+        Lunaria
+      </h1>
+
+      {/* Subtext */}
+      <p className="relative z-10 mt-4 font-dm text-lg text-[#6B4C43]">
+        Blooming your flowers...
+      </p>
+
+      {/* Animasi Kelopak */}
+      <div className="relative mt-8 flex space-x-2">
+        <div className="w-3 h-3 bg-[#CA217C] rounded-full animate-bounce [animation-delay:0ms]"></div>
+        <div className="w-3 h-3 bg-[#EAC81D] rounded-full animate-bounce [animation-delay:150ms]"></div>
+        <div className="w-3 h-3 bg-[#BC6C5C] rounded-full animate-bounce [animation-delay:300ms]"></div>
+        <div className="w-3 h-3 bg-[#5584DB] rounded-full animate-bounce [animation-delay:450ms]"></div>
+      </div>
+
+      {/* Shadow bawah */}
+      <div className="absolute bottom-0 left-0 right-0 h-[150px] bg-gradient-to-t from-[#FFF7FC] to-transparent"></div>
+    </div>
+  );
+
   if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
 
   const seasonColors = {
@@ -122,7 +173,7 @@ export default function ShopPage() {
   else if (sortOption === "umur-desc") filteredFlowers.sort((a, b) => b.umur_tahan - a.umur_tahan);
 
   return (
-    <div className={`${dmSans.className} min-h-screen bg-[#fff8f7]`}>
+    <div className={`${dmSans.variable} font-dm min-h-screen bg-[#fff8f7]`}>
       <Header
         setMenuOpen={setMenuOpen}
         activeSection={activeSection}
@@ -142,8 +193,8 @@ export default function ShopPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-white/70 via-transparent to-white/70"></div>
 
             <h1
-              className={`${caslon.className} absolute inset-0 flex items-center justify-center 
-              text-5xl sm:text-7xl md:text-9xl text-[#451900] drop-shadow-lg tracking-widest`}
+              className={`font-caslon absolute inset-0 flex items-center justify-center
+              text-6xl sm:text-8xl md:text-9xl text-[#451900] tracking-[0.15em] drop-shadow-md opacity-0 animate-[fadeIn_1s_ease-out_forwards]`}
             >
               Lunaria
             </h1>
@@ -160,7 +211,7 @@ export default function ShopPage() {
                 <button
                   key={season}
                   onClick={() => setSelectedSeason(season)}
-                  className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-md ${
+                  className={`font-dm px-4 sm:px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-md ${
                     isActive
                       ? `${seasonColors[season].button} text-white`
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -312,7 +363,7 @@ export default function ShopPage() {
               <input
                 type="text"
                 placeholder="Find your flower..."
-                className="w-full border border-[#e6d4ce] bg-white/80 rounded-lg px-4 py-2 shadow-sm 
+                className="font-dm w-full border border-[#e6d4ce] bg-white/80 rounded-lg px-4 py-2 shadow-sm 
                           text-gray-700 transition-all duration-300 ease-in-out
                           hover:shadow-md hover:border-[#c9a49d]
                           focus:outline-none focus:ring-2 focus:ring-[#CA217C]/40"
@@ -361,13 +412,13 @@ export default function ShopPage() {
                       <h2 className="font-serif text-base sm:text-xl mb-2">
                         {flower.name}
                       </h2>
-                      <p className="text-xs sm:text-sm text-gray-600 mb-3">
+                      <p className="font-dm text-xs sm:text-sm text-gray-600 mb-3">
                         {flower.meaning}
                       </p>
                       <button
                         disabled={!isAvailable}
                         onClick={() => setSelectedFlower(flower)}
-                        className={`px-3 sm:px-4 py-2 rounded-lg text-white font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-md ${
+                        className={`font-dm px-3 sm:px-4 py-2 rounded-lg text-white font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-md ${
                           isAvailable
                             ? `${seasonColors[selectedSeason].button} hover:opacity-90`
                             : "bg-gray-400 cursor-not-allowed"

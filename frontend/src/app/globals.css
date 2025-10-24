@@ -4,15 +4,8 @@
 @tailwind components;
 @tailwind utilities;
 
-<<<<<<< HEAD
-body {
-  background-color: #F2E3EC;
-  scroll-behavior: smooth; 
-}
-=======
-
 :root {
-  --background: #ffffff;
+  --background: #F2E3EC; /* Warna dari versi HEAD */
   --foreground: #171717;
 }
 
@@ -23,19 +16,23 @@ body {
   --font-mono: var(--font-geist-mono);
 }
 
-/* @media (prefers-color-scheme: dark) {
+/* Dark mode (optional, uncomment if needed)
+@media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-} */
+}
+*/
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  scroll-behavior: smooth;
 }
 
+/* Animasi untuk drawer atau popup */
 @keyframes slide-in {
   from {
     transform: translateX(100%);
@@ -48,4 +45,3 @@ body {
 .animate-slide-in {
   animation: slide-in 0.3s ease forwards;
 }
->>>>>>> feature/naqil-catalog-popup-cart-payment

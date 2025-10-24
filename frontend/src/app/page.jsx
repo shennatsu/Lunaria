@@ -8,12 +8,41 @@ import { Header } from './components/Header'
 import { MobileMenu } from './components/MobileMenu'
 import { PostcardScroller } from './components/Scroller'
 import { Footer } from './components/Footer' // Pastikan Footer diimport
+import CartDrawer from "./components/cartdrawer";
 
 // ----- HALAMAN UTAMA -----
 export default function Home() {
   const [isMenuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isCartOpen, setCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
+  const [initialized, setInitialized] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowIntro(false), 2500); // tampil 2.5 detik
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const cartKey = user ? `cart_${user.email}` : "cart_guest";
+
+    const saved = localStorage.getItem(cartKey);
+    if (saved) setCartItems(JSON.parse(saved));
+
+    setInitialized(true); // <--- tandai bahwa cart sudah diload
+  }, []);
+
+  useEffect(() => {
+    if (!initialized) return; // <--- cegah overwrite sebelum load selesai
+
+    const user = JSON.parse(localStorage.getItem("user"));
+    const cartKey = user ? `cart_${user.email}` : "cart_guest";
+
+    localStorage.setItem(cartKey, JSON.stringify(cartItems));
+  }, [cartItems, initialized]);
 
   useEffect(() => {
     // --- PERBAIKAN LOGIKA CEK LOGIN ---
@@ -62,6 +91,40 @@ export default function Home() {
     return () => { window.removeEventListener('scroll', handleScroll); };
   }, []); // Dependency array [] -> hanya jalan sekali saat mount
 
+  if (showIntro)
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#FFF7FC] to-[#FCE4EC] overflow-hidden relative">
+      {/* Background bunga lembut */}
+      <div className="absolute inset-0 opacity-30">
+        <Image
+          src="/lily.png"
+          alt="Background lily"
+          fill
+          className="object-cover blur-sm scale-105"
+          priority
+        />
+      </div>
+
+      {/* Logo / Judul */}
+      <h1 className="font-caslon text-6xl sm:text-7xl text-[#451900] tracking-widest opacity-0 animate-[fadeIn_1s_ease-out_forwards]">
+        Lunaria
+      </h1>
+
+      {/* Subtext */}
+      <p className="mt-4 font-dm text-lg text-[#6B4C43] opacity-0 animate-[fadeIn_1s_ease-out_0.5s_forwards]">
+        Find your destined flower...
+      </p>
+
+      <style jsx global>{`
+        @keyframes fadeIn {
+          0% { opacity: 0; transform: translateY(10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </div>
+  );
+
+
   return (
     <> {/* Fragment agar Footer bisa di luar main */}
       <main
@@ -79,6 +142,7 @@ export default function Home() {
           setMenuOpen={setMenuOpen}
           activeSection={activeSection}
           isLoggedIn={isLoggedIn} // Kirim status login
+          onCartClick={() => setCartOpen(true)}
         />
 
         {/* Gambar Bunga Lily */}
@@ -131,6 +195,23 @@ export default function Home() {
           <PostcardScroller direction="right" />
         </section>
           <Footer /> {/* Footer di luar main */}
+
+          {isCartOpen && (
+          <CartDrawer
+            cartItems={cartItems}
+            onClose={() => setCartOpen(false)}
+            onUpdateQty={(id, qty, extra = {}) =>
+              setCartItems((prev) =>
+                prev.map((item) =>
+                  item.id === id ? { ...item, qty, ...extra } : item
+                )
+              )
+            }
+            onRemove={(id) =>
+              setCartItems((prev) => prev.filter((item) => item.id !== id))
+            }
+          />
+        )}
 
       </main>
 

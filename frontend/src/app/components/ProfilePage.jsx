@@ -63,8 +63,12 @@ export default function ProfilePage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('user'); 
-    window.location.href = '/';
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      localStorage.removeItem(`cart_${user.email}`);
+      localStorage.removeItem("user");
+    }
+    window.location.href = "/";
   };
 
   // Ambil data dari backend saat halaman dibuka
