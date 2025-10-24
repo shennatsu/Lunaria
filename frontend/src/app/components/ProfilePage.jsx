@@ -1,11 +1,18 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { User, Phone, MapPin, Save, LogOut, Calendar, ChevronDown, ChevronUp, Package } from 'lucide-react';
-
+import { User, Phone, MapPin, Save, LogOut, Calendar, ChevronDown, ChevronUp, Package, Home, X } from 'lucide-react';
+import { MobileMenu } from '../components/MobileMenu';
+import { useRouter } from 'next/navigation';
+import { Header } from '../components/Header';
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('userInfo');
+   const router = useRouter(); 
+
+  // State untuk Mobile Menu
+  const [isMenuOpen, setMenuOpen] = useState(false);
+
   const [formData, setFormData] = useState({
     username: 'prot',
     phone: '08xxxxxxxxxx',
@@ -56,22 +63,22 @@ export default function ProfilePage() {
   };
 
   const handleLogout = () => {
-  localStorage.removeItem('user'); 
-  window.location.href = '/';
-};
+    localStorage.removeItem('user'); 
+    window.location.href = '/';
+  };
 
   // Ambil data dari backend saat halaman dibuka
   useEffect(() => {
-  const fetchProfile = async () => {
-  try {
-  const storedUser = JSON.parse(localStorage.getItem('user'));
-   if (!storedUser) {
-        console.error("User belum login!");
-        window.location.href = '/login'; // Redirect kalau belum login
-        return;
-      }
+    const fetchProfile = async () => {
+      try {
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        if (!storedUser) {
+            console.error("User belum login!");
+            window.location.href = '/login'; // Redirect kalau belum login
+            return;
+          }
 
-  const res = await fetch(`http://localhost:5000/api/profile/${storedUser.id}`);
+        const res = await fetch(`http://localhost:5000/api/profile/${storedUser.id}`);
 
         if (!res.ok) throw new Error('Gagal mengambil data profil');
         const data = await res.json();
@@ -89,14 +96,15 @@ export default function ProfilePage() {
   }, []);
 
   const handleSubmit = async (e) => {
-     e.preventDefault();
+      e.preventDefault();
 
-  try {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (!storedUser) {
-    alert("Kamu belum login!");
-    return;
-    }
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      if (!storedUser) {
+      // Gunakan UI kustom, bukan alert()
+      console.error("Kamu belum login!");
+      return;
+      }
 
 
       const response = await fetch(`http://localhost:5000/api/profile/${storedUser.id}`, {
@@ -111,11 +119,13 @@ export default function ProfilePage() {
 
     const data = await response.json();
     console.log("✅ Response dari backend:", data);
-    alert("Profil berhasil diperbarui!");
-  } catch (err) {
-    console.error("❌ Error saat update profil:", err);
-    alert("Gagal memperbarui profil!");
-  }
+    // Gunakan UI kustom, bukan alert()
+    console.log("Profil berhasil diperbarui!");
+    } catch (err) {
+      console.error("❌ Error saat update profil:", err);
+      // Gunakan UI kustom, bukan alert()
+      console.error("Gagal memperbarui profil!");
+    }
   };
 
   const getStatusColor = (status) => {
@@ -128,11 +138,35 @@ export default function ProfilePage() {
     }
   };
 
+
+
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFDAF5] via-[#E9B6C2] to-[#E1688B] p-6">
+      
+
+     
+      {/* === TOMBOL HOME (MUNCUL HANYA SAAT LOGIN) === */}
+      {typeof window !== "undefined" && localStorage.getItem("user") && (
+     <div className="fixed top-6 left-6 z-30">
+      <button
+        onClick={() => router.push('/')} // langsung arahkan ke halaman home
+        className="flex items-center justify-center w-12 h-12 rounded-full shadow-lg bg-white/70 backdrop-blur-md text-gray-800 hover:bg-white transition-colors"
+        aria-label="Kembali ke Home"
+      >
+        <Home className="w-6 h-6" />
+      </button>
+    </div>
+
+      )}
+
+
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-8">
         <div className="flex items-center justify-between bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+          
+          {/* Sisi Kiri Header */}
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg">
               🌸
@@ -142,10 +176,12 @@ export default function ProfilePage() {
               <p className="text-gray-600">Kelola informasi dan riwayat pesanan Anda</p>
             </div>
           </div>
+          
+          {/* Sisi Kanan Header */}
           <button 
-          onClick={handleLogout}
-          className="px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 hover:border-pink-300 transition-all duration-300 flex items-center gap-2 shadow-md">
-             <LogOut className="w-5 h-5" />
+            onClick={handleLogout}
+            className="px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 hover:border-pink-300 transition-all duration-300 flex items-center gap-2 shadow-md">
+              <LogOut className="w-5 h-5" />
             Logout
           </button>
         </div>
@@ -272,7 +308,7 @@ export default function ProfilePage() {
                             <ChevronUp className="w-6 h-6 text-[#4A1900]" />
                           ) : (
                             <ChevronDown className="w-6 h-6 text-[#4A1900]" />
-                          )}                          </button>
+                          )}                       </button>
                         </div>
                         
                         <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
@@ -333,3 +369,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+
