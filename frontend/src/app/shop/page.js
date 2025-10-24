@@ -48,7 +48,7 @@ export default function ShopPage() {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setCartOpen] = useState(false);
 
-  // 🛒 Tambah ke keranjang
+  // Tambah ke keranjang
   const handleAddToCart = (flower) => {
     setCartItems((prev) => {
       const existing = prev.find((item) => item.id === flower.id);
@@ -59,7 +59,16 @@ export default function ShopPage() {
             : item
         );
       } else {
-        return [...prev, { ...flower }];
+        return [
+          ...prev,
+          { 
+            ...flower, 
+            qty: flower.qty || 1,
+            to: "",
+            message: "",
+            isPublic: false,
+          },
+        ];
       }
     });
     setCartOpen(true);
@@ -349,7 +358,6 @@ export default function ShopPage() {
 
                     {/* Belakang */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2 sm:px-4 [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                      {/* Nama bunga → tetap serif */}
                       <h2 className="font-serif text-base sm:text-xl mb-2">
                         {flower.name}
                       </h2>
@@ -390,10 +398,10 @@ export default function ShopPage() {
             <CartDrawer
               cartItems={cartItems}
               onClose={() => setCartOpen(false)}
-              onUpdateQty={(id, qty) =>
+              onUpdateQty={(id, qty, extra = {}) =>
                 setCartItems((prev) =>
                   prev.map((item) =>
-                    item.id === id ? { ...item, qty } : item
+                    item.id === id ? { ...item, qty, ...extra } : item
                   )
                 )
               }

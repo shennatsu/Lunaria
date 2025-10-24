@@ -11,7 +11,7 @@ const dmSans = DM_Sans({
 });
 
 export default function PaymentPopup({ total, onClose, onConfirm }) {
-  const [method, setMethod] = useState("credit"); // default ke credit card
+  const [method, setMethod] = useState("credit");
   const [loading, setLoading] = useState(false);
 
   const handlePay = () => {
