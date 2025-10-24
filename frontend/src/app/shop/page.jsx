@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Select from "react-select";
 import Image from "next/image";
 import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
 import FlowerPopup from "../components/flowerpopup";
 import CartDrawer from "../components/cartdrawer";
 import { DM_Sans, Libre_Caslon_Display } from "next/font/google";
@@ -173,7 +174,7 @@ export default function ShopPage() {
   else if (sortOption === "umur-desc") filteredFlowers.sort((a, b) => b.umur_tahan - a.umur_tahan);
 
   return (
-    <div className={`${dmSans.variable} font-dm min-h-screen bg-[#fff8f7]`}>
+    <div className={`${dmSans.variable} font-dm flex flex-col min-h-screen bg-[#fff8f7]`}>
       <Header
         setMenuOpen={setMenuOpen}
         activeSection={activeSection}
@@ -204,7 +205,7 @@ export default function ShopPage() {
         {/* Filter dan daftar bunga */}
         <section>
           {/* Tombol Musim */}
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-8 mt-12 mb-8 px-4 max-w-xs sm:max-w-none mx-auto">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-8 mt-12 mb-12 px-4 max-w-xs sm:max-w-none mx-auto">
             {["Spring", "Summer", "Autumn", "Winter"].map((season) => {
               const isActive = selectedSeason === season;
               return (
@@ -224,7 +225,7 @@ export default function ShopPage() {
           </div>
 
           {/* Filter dan Search */}
-          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-10 px-6 sm:px-16 md:px-24 lg:px-32">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12 px-6 sm:px-16 md:px-24 lg:px-32">
             <div className="w-full sm:w-44">
               <Select
                 options={sortOptions}
@@ -461,8 +462,11 @@ export default function ShopPage() {
               }
             />
           )}
+
         </section>
       </main>
+      {/* Footer */}
+          <Footer />
     </div>
   );
 }
