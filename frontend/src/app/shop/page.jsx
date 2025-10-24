@@ -21,16 +21,16 @@ const caslon = Libre_Caslon_Display({
 
 const sortOptions = [
   { value: "", label: "Sort" },
-  { value: "harga-asc", label: "Harga Termurah" },
-  { value: "harga-desc", label: "Harga Termahal" },
-  { value: "umur-asc", label: "Umur Tahan Terpendek" },
-  { value: "umur-desc", label: "Umur Tahan Terlama" },
+  { value: "harga-asc", label: "Lowest Price" },
+  { value: "harga-desc", label: "Highest Price" },
+  { value: "umur-asc", label: "Shortest Lifespan" },
+  { value: "umur-desc", label: "Longest Lifespan" },
 ];
 
 const availabilityOptions = [
   { value: "all", label: "All" },
-  { value: "available", label: "Tersedia" },
-  { value: "unavailable", label: "Tidak Tersedia" },
+  { value: "available", label: "Available" },
+  { value: "unavailable", label: "Out of Stock" },
 ];
 
 export default function ShopPage() {
