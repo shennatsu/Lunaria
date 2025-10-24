@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Lily",
+    "meaning": "purity; love; beauty; rebirth",
+    "price": 20000,
+    "season": "Spring",
+    "umur_tahan": 5,
+    "image": "/lily.svg",
+    "otherImages": ["/lily2.svg", "/lily3.svg"],
+    "rekomendasi_perpaduan": ["Sunflower"],
+    "status_tersedia": true
+  },
+  {
+    "id": 2,
+    "name": "Sunflower",
+    "meaning": "happiness; positivity; warmth; loyalty",
+    "price": 20000,
+    "season": "Summer",
+    "umur_tahan": 10,
+    "image": "/sunflower.svg",
+    "otherImages": ["/sunflower2.svg", "/sunflower3.svg"],
+    "rekomendasi_perpaduan": ["Lily"],
+    "status_tersedia": true
+  },
+  {
+    "id": 3,
+    "name": "Daisy",
+    "meaning": "happiness; positivity; warmth; loyalty",
+    "price": 20000,
+    "season": "Spring",
+    "umur_tahan": 10,
+    "image": "/daisy.svg",
+    "otherImages": ["/daisy2.svg", "/daisy3.svg"],
+    "rekomendasi_perpaduan": ["Lily"],
+    "status_tersedia": true
+  }
+]
