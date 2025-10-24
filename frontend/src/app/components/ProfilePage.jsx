@@ -60,11 +60,19 @@ export default function ProfilePage() {
   window.location.href = '/';
 };
 
-  // 🔹 Ambil data dari backend saat halaman dibuka
+  // Ambil data dari backend saat halaman dibuka
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/profile/1761040079213");
+  const fetchProfile = async () => {
+  try {
+  const storedUser = JSON.parse(localStorage.getItem('user'));
+   if (!storedUser) {
+        console.error("User belum login!");
+        window.location.href = '/login'; // Redirect kalau belum login
+        return;
+      }
+
+  const res = await fetch(`http://localhost:5000/api/profile/${storedUser.id}`);
+
         if (!res.ok) throw new Error('Gagal mengambil data profil');
         const data = await res.json();
         setFormData({
@@ -84,7 +92,14 @@ export default function ProfilePage() {
      e.preventDefault();
 
   try {
-    const response = await fetch("http://localhost:5000/api/profile/1761040079213", {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (!storedUser) {
+    alert("Kamu belum login!");
+    return;
+    }
+
+
+      const response = await fetch(`http://localhost:5000/api/profile/${storedUser.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
