@@ -1,10 +1,28 @@
 [
   {
     "id": 1761040079213,
-    "username": "Kobumujaer",
+    "username": "Astaga",
     "email": "kobu@gmail.com",
     "password": "test123",
-    "phone": "081294600557",
-    "address": "Jl.Mandor"
+    "phone": "123123",
+    "address": "Jalan"
+  },
+  {
+    "id": 1761244707063,
+    "username": "2410511080",
+    "email": "Bisaai@gmail.com",
+    "password": "12345"
+  },
+  {
+    "id": 1761246789035,
+    "username": "Indonesia",
+    "email": "12345@gmail.com",
+    "password": "asu"
+  },
+  {
+    "id": 1761277062235,
+    "username": "2410511080",
+    "email": "123@gmail.com",
+    "password": "123"
   }
 ]
