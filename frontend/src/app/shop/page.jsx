@@ -111,16 +111,6 @@ export default function ShopPage() {
   if (loading)
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#FFF7FC] to-[#FCE4EC] relative overflow-hidden">
-      {/* Background Bunga Lembut */}
-      <div className="absolute inset-0 opacity-30">
-        <Image
-          src="/lily.png"
-          alt="background flowers"
-          fill
-          className="object-cover blur-sm scale-105"
-          priority
-        />
-      </div>
 
       {/* Logo / Judul */}
       <h1 className="relative z-10 font-caslon text-6xl sm:text-7xl text-[#451900] tracking-widest drop-shadow-lg">
