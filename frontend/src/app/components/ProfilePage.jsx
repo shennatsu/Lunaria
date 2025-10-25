@@ -1,59 +1,29 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { User, Phone, MapPin, Save, LogOut, Calendar, ChevronDown, ChevronUp, Package, Home, X } from 'lucide-react';
-import { MobileMenu } from '../components/MobileMenu';
+import { User, Phone, MapPin, LogOut, ChevronDown, ChevronUp, Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Header } from '../components/Header';
+import { DM_Sans } from "next/font/google";
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-dm",
+});
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('userInfo');
-   const router = useRouter(); 
-
-  // State untuk Mobile Menu
-  const [isMenuOpen, setMenuOpen] = useState(false);
-
   const [formData, setFormData] = useState({
-    username: 'prot',
-    phone: '08xxxxxxxxxx',
+    username: '',
+    phone: '',
     address: ''
   });
 
-  // Dummy data orders - nanti ganti dari API backend
-  const orders = [
-    {
-      id: 'ORD-2024-001',
-      date: '2024-10-15',
-      status: 'Delivered',
-      total: 450000,
-      items: [
-        { name: 'Rose Bouquet Premium', qty: 2, price: 225000 }
-      ],
-      shippingAddress: 'Jl. Margonda Raya No. 123, Depok'
-    },
-    {
-      id: 'ORD-2024-002',
-      date: '2024-10-18',
-      status: 'Shipped',
-      total: 320000,
-      items: [
-        { name: 'Lily Arrangement', qty: 1, price: 320000 }
-      ],
-      shippingAddress: 'Jl. Margonda Raya No. 123, Depok'
-    },
-    {
-      id: 'ORD-2024-003',
-      date: '2024-10-20',
-      status: 'Processing',
-      total: 180000,
-      items: [
-        { name: 'Sunflower Bundle', qty: 1, price: 180000 }
-      ],
-      shippingAddress: 'Jl. Margonda Raya No. 123, Depok'
-    }
-  ];
-
+  const [orders, setOrders] = useState([]);
   const [expandedOrder, setExpandedOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+
 
   const handleChange = (e) => {
     setFormData({
@@ -68,23 +38,23 @@ export default function ProfilePage() {
       localStorage.removeItem(`cart_${user.email}`);
       localStorage.removeItem("user");
     }
-    window.location.href = "/";
+    router.push('/');
   };
 
-  // Ambil data dari backend saat halaman dibuka
+  // Fetch profile data
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const storedUser = JSON.parse(localStorage.getItem('user'));
         if (!storedUser) {
-            console.error("User belum login!");
-            window.location.href = '/login'; // Redirect kalau belum login
-            return;
-          }
+          console.error("User belum login!");
+          router.push('/login');
+          return;
+        }
 
         const res = await fetch(`http://localhost:5000/api/profile/${storedUser.id}`);
-
         if (!res.ok) throw new Error('Gagal mengambil data profil');
+        
         const data = await res.json();
         setFormData({
           username: data.username || '',
@@ -97,38 +67,56 @@ export default function ProfilePage() {
     };
 
     fetchProfile();
-  }, []);
+  }, [router]);
+
+  // Fetch orders data
+ // Di useEffect fetchOrders, ganti jadi ini:
+useEffect(() => {
+  const fetchOrders = async () => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      if (!storedUser) return;
+
+      // ✅ Fetch real orders dari backend
+      const res = await fetch(`http://localhost:5000/api/orders/${storedUser.id}`);
+      const data = await res.json();
+      setOrders(data);
+      setLoading(false);
+    } catch (err) {
+      console.error("❌ Error saat fetch orders:", err);
+      setLoading(false);
+    }
+  };
+
+  fetchOrders();
+}, [localStorage.getItem("lastOrder")]);
 
   const handleSubmit = async (e) => {
-      e.preventDefault();
+    e.preventDefault();
 
     try {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       if (!storedUser) {
-      // Gunakan UI kustom, bukan alert()
-      console.error("Kamu belum login!");
-      return;
+        console.error("Kamu belum login!");
+        return;
       }
 
-
       const response = await fetch(`http://localhost:5000/api/profile/${storedUser.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    if (!response.ok) {
-      throw new Error(`Gagal update: ${response.status}`);
-    }
+      if (!response.ok) {
+        throw new Error(`Gagal update: ${response.status}`);
+      }
 
-    const data = await response.json();
-    console.log("✅ Response dari backend:", data);
-    // Gunakan UI kustom, bukan alert()
-    console.log("Profil berhasil diperbarui!");
+      const data = await response.json();
+      console.log("✅ Response dari backend:", data);
+      alert("Profil berhasil diperbarui!");
     } catch (err) {
       console.error("❌ Error saat update profil:", err);
-      // Gunakan UI kustom, bukan alert()
-      console.error("Gagal memperbarui profil!");
+      alert("Gagal memperbarui profil!");
     }
   };
 
@@ -142,35 +130,24 @@ export default function ProfilePage() {
     }
   };
 
-
-
-
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFDAF5] via-[#E9B6C2] to-[#E1688B] p-6">
-      
-
-     
-      {/* === TOMBOL HOME (MUNCUL HANYA SAAT LOGIN) === */}
+      {/* Home Icon - Top Left */}
       {typeof window !== "undefined" && localStorage.getItem("user") && (
-     <div className="fixed top-6 left-6 z-30">
-      <button
-        onClick={() => router.push('/')} // langsung arahkan ke halaman home
-        className="flex items-center justify-center w-12 h-12 rounded-full shadow-lg bg-white/70 backdrop-blur-md text-gray-800 hover:bg-white transition-colors"
-        aria-label="Kembali ke Home"
-      >
-        <Home className="w-6 h-6" />
-      </button>
-    </div>
-
+        <div className="fixed top-6 left-6 z-50">
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center justify-center w-12 h-12 rounded-full shadow-lg bg-white/70 backdrop-blur-md text-gray-800 hover:bg-white hover:scale-110 transition-all duration-300"
+            aria-label="Kembali ke Home"
+          >
+            <Home className="w-6 h-6" />
+          </button>
+        </div>
       )}
 
-
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-8">
+      <div className="max-w-7xl mx-auto mb-8 pt-4">
         <div className="flex items-center justify-between bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
-          
-          {/* Sisi Kiri Header */}
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg">
               🌸
@@ -180,12 +157,11 @@ export default function ProfilePage() {
               <p className="text-gray-600">Kelola informasi dan riwayat pesanan Anda</p>
             </div>
           </div>
-          
-          {/* Sisi Kanan Header */}
           <button 
             onClick={handleLogout}
-            className="px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 hover:border-pink-300 transition-all duration-300 flex items-center gap-2 shadow-md">
-              <LogOut className="w-5 h-5" />
+            className="px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 hover:border-pink-300 transition-all duration-300 flex items-center gap-2 shadow-md"
+          >
+            <LogOut className="w-5 h-5" />
             Logout
           </button>
         </div>
@@ -224,8 +200,7 @@ export default function ProfilePage() {
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 mb-8">Dashboard</h2>
                 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Username */}
+                <div className="space-y-6">
                   <div>
                     <label className="flex items-center gap-2 text-gray-700 font-semibold mb-3">
                       <User className="w-5 h-5 text-pink-500" />
@@ -241,7 +216,6 @@ export default function ProfilePage() {
                     />
                   </div>
 
-                  {/* Phone */}
                   <div>
                     <label className="flex items-center gap-2 text-gray-700 font-semibold mb-3">
                       <Phone className="w-5 h-5 text-pink-500" />
@@ -257,7 +231,6 @@ export default function ProfilePage() {
                     />
                   </div>
 
-                  {/* Address */}
                   <div>
                     <label className="flex items-center gap-2 text-gray-700 font-semibold mb-3">
                       <MapPin className="w-5 h-5 text-pink-500" />
@@ -273,15 +246,14 @@ export default function ProfilePage() {
                     />
                   </div>
 
-                  {/* Submit Button */}
                   <button
-                    type="submit"
+                    onClick={handleSubmit}
                     className="w-full py-4 bg-gradient-to-r from-pink-400 to-pink-600 text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
                   >
                     <span>💾</span>
                     Simpan Perubahan
                   </button>
-                </form>
+                </div>
               </div>
             )}
 
@@ -289,80 +261,82 @@ export default function ProfilePage() {
               <div>
                 <h2 className="text-3xl font-bold text-gray-800 mb-8">My Orders</h2>
                 
-                <div className="space-y-4">
-                  {orders.map((order) => (
-                    <div
-                      key={order.id}
-                      className="border-2 border-gray-200 rounded-2xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300"
-                    >
-                      {/* Order Header */}
-                      <div
-                        className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
-                        onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-4">
-                            <h3 className="text-xl font-bold text-gray-800">{order.id}</h3>
-                            <span className={`px-4 py-1 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
-                              {order.status}
-                            </span>
-                          </div>
-                          <button className="text-2xl text-gray-400 hover:text-pink-500 transition-colors">
-                          {expandedOrder === order.id ? (
-                            <ChevronUp className="w-6 h-6 text-[#4A1900]" />
-                          ) : (
-                            <ChevronDown className="w-6 h-6 text-[#4A1900]" />
-                          )}                       </button>
-                        </div>
-                        
-                        <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
-                          <span>📅</span>
-                          <span>{order.date}</span>
-                        </div>
-                        
-                        <div className="text-2xl font-bold text-gray-800">
-                          Rp {order.total.toLocaleString('id-ID')}
-                        </div>
-                      </div>
-
-                      {/* Order Details (Expandable) */}
-                      {expandedOrder === order.id && (
-                        <div className="border-t-2 border-gray-100 p-6 bg-gray-50 animate-fadeIn">
-                          <h4 className="font-bold text-gray-800 mb-4 text-lg">Order Items</h4>
-                          
-                          <div className="space-y-3 mb-6">
-                            {order.items.map((item, idx) => (
-                              <div key={idx} className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
-                                <div>
-                                  <p className="font-semibold text-gray-800">{item.name}</p>
-                                  <p className="text-sm text-gray-500">Qty: {item.qty}</p>
-                                </div>
-                                <p className="font-bold text-gray-800">
-                                  Rp {item.price.toLocaleString('id-ID')}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-
-                          <div className="bg-white p-4 rounded-xl shadow-sm">
-                            <div className="flex items-start gap-3">
-                              <span className="text-pink-500 text-xl">📍</span>
-                              <div>
-                                <p className="font-semibold text-gray-700 mb-1">Shipping Address</p>
-                                <p className="text-gray-600">{order.shippingAddress}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {orders.length === 0 && (
+                {loading ? (
+                  <div className="text-center py-16">
+                    <div className="text-4xl mb-4">⏳</div>
+                    <p className="text-gray-500">Loading orders...</p>
+                  </div>
+                ) : orders.length === 0 ? (
                   <div className="text-center py-16">
                     <div className="text-6xl mb-4">📦</div>
                     <p className="text-xl text-gray-500">Belum ada pesanan</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {orders.map((order) => (
+                      <div
+                        key={order.id}
+                        className="border-2 border-gray-200 rounded-2xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300"
+                      >
+                        <div
+                          className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
+                          onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-4">
+                              <h3 className="text-xl font-bold text-gray-800">{order.id}</h3>
+                              <span className={`px-4 py-1 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
+                                {order.status}
+                              </span>
+                            </div>
+                            {expandedOrder === order.id ? (
+                              <ChevronUp className="w-6 h-6 text-gray-400 hover:text-pink-500" />
+                            ) : (
+                              <ChevronDown className="w-6 h-6 text-gray-400 hover:text-pink-500" />
+                            )}
+                          </div>
+                          
+                          <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
+                            <span>📅</span>
+                            <span>{order.date}</span>
+                          </div>
+                          
+                          <div className="text-2xl font-bold text-gray-800">
+                            Rp {order.total.toLocaleString('id-ID')}
+                          </div>
+                        </div>
+
+                        {expandedOrder === order.id && (
+                          <div className="border-t-2 border-gray-100 p-6 bg-gray-50">
+                            <h4 className="font-bold text-gray-800 mb-4 text-lg">Order Items</h4>
+                            
+                            <div className="space-y-3 mb-6">
+                              {order.items.map((item, idx) => (
+                                <div key={idx} className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
+                                  <div>
+                                    <p className="font-semibold text-gray-800">{item.name}</p>
+                                    <p className="text-sm text-gray-500">Qty: {item.qty}</p>
+                                  </div>
+                                  <p className="font-bold text-gray-800">
+                                    Rp {item.price.toLocaleString('id-ID')}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="bg-white p-4 rounded-xl shadow-sm">
+                              <div className="flex items-start gap-3">
+                                <span className="text-pink-500 text-xl">📍</span>
+                                <div>
+                                  <p className="font-semibold text-gray-700 mb-1">Shipping Address</p>
+                                  <p className="text-gray-600">{order.shippingAddress}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -373,4 +347,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

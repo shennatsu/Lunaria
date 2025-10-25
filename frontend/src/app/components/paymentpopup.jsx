@@ -10,21 +10,67 @@ const dmSans = DM_Sans({
   variable: "--font-dm",
 });
 
-export default function PaymentPopup({ total, onClose, onConfirm }) {
+export default function PaymentPopup({ total, cartItems, onClose, onConfirm }) {
   const [method, setMethod] = useState("credit");
   const [loading, setLoading] = useState(false);
 
-  const handlePay = () => {
-    if (method === "paypal") {
-      // Simulasi redirect ke PayPal
-      setLoading(true);
-      setTimeout(() => {
+  const handlePay = async () => {
+    setLoading(true);
+
+    try {
+      // Simulasi payment process
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Ambil user dari localStorage
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      if (!storedUser) {
+        alert("Silakan login terlebih dahulu!");
         setLoading(false);
-        alert("Payment successful via PayPal!");
-        onConfirm();
-      }, 2000);
-    } else {
-      onConfirm();
+        return;
+      }
+
+      // Siapkan data order
+      const orderData = {
+        userId: storedUser.id,
+        items: cartItems.map(item => ({
+          name: item.name,
+          qty: item.qty,
+          price: item.price,
+          to: item.to || '',
+          message: item.message || '',
+          isPublic: item.isPublic || false
+        })),
+        total: total,
+        shippingAddress: storedUser.address || 'Alamat belum diisi',
+        paymentMethod: method
+      };
+
+      // Kirim order ke backend
+      const response = await fetch('http://localhost:5000/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Gagal membuat order');
+      }
+
+      const result = await response.json();
+      console.log("✅ Order created:", result);
+
+      alert(`Payment successful!\nOrder ID: ${result.order.id}`);
+      
+      // Clear cart setelah payment sukses
+      const cartKey = `cart_${storedUser.email}`;
+      localStorage.removeItem(cartKey);
+
+      setLoading(false);
+      onConfirm(); // Close popup dan refresh
+    } catch (error) {
+      console.error("❌ Payment error:", error);
+      alert("Payment failed. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -109,13 +155,7 @@ export default function PaymentPopup({ total, onClose, onConfirm }) {
             </form>
           ) : (
             <div className="flex flex-col items-center py-6">
-              <Image
-                src="/paypal.png"
-                alt="PayPal"
-                width={120}
-                height={80}
-                className="mb-4"
-              />
+              <div className="text-6xl mb-4">💳</div>
               <p className="text-gray-600 text-center text-sm mb-4">
                 You will be redirected to PayPal to complete your purchase securely.
               </p>
@@ -123,7 +163,7 @@ export default function PaymentPopup({ total, onClose, onConfirm }) {
               {loading && (
                 <div className="flex items-center gap-2 text-[#987772]">
                   <Loader2 className="animate-spin" size={18} />
-                  <span>Redirecting to PayPal...</span>
+                  <span>Processing payment...</span>
                 </div>
               )}
             </div>
@@ -153,7 +193,7 @@ export default function PaymentPopup({ total, onClose, onConfirm }) {
 
           {method === "paypal" && !loading && (
             <p className="text-center text-gray-500 text-xs mt-2">
-              You’ll be redirected to PayPal for secure checkout.
+              You'll be redirected to PayPal for secure checkout.
             </p>
           )}
         </div>

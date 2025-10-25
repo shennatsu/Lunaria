@@ -4,6 +4,7 @@ import Image from "next/image";
 import { X, Trash2, Globe, Lock } from "lucide-react";
 import PaymentPopup from "./paymentpopup";
 import { DM_Sans } from "next/font/google";
+import { useRouter } from 'next/navigation';
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -13,7 +14,7 @@ const dmSans = DM_Sans({
 
 export default function CartDrawer({ cartItems, onClose, onUpdateQty, onRemove }) {
   const [showPayment, setShowPayment] = useState(false);
-
+  const router = useRouter();
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
   const shipping = 5000;
   const total = subtotal + shipping;
@@ -184,11 +185,13 @@ export default function CartDrawer({ cartItems, onClose, onUpdateQty, onRemove }
       {showPayment && (
         <PaymentPopup
           total={total}
+          cartItems={cartItems}
           onClose={() => setShowPayment(false)}
           onConfirm={() => {
             alert("Payment successful!");
             setShowPayment(false);
             onClose();
+           router.push('/profile');
           }}
         />
       )}
