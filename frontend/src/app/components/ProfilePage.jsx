@@ -5,11 +5,23 @@ import { User, Phone, MapPin, LogOut, ChevronDown, ChevronUp, Home } from 'lucid
 import { useRouter } from 'next/navigation';
 import { DM_Sans } from "next/font/google";
 
+
 const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-dm",
 });
+
+const dummyOrder = {
+  id: 'ORD-DEMO-001',
+  date: '2024-10-20',
+  status: 'Delivered',
+  total: 450000,
+  items: [
+    { name: 'Rose Bouquet (Contoh)', qty: 2, price: 225000 }
+  ],
+  shippingAddress: 'Jl. Juri Lomba Frontend No. 1, Jakarta'
+};
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -69,27 +81,37 @@ export default function ProfilePage() {
     fetchProfile();
   }, [router]);
 
-  // Fetch orders data
- // Di useEffect fetchOrders, ganti jadi ini:
+// Fetch orders data
 useEffect(() => {
   const fetchOrders = async () => {
+    setLoading(true); // Selalu mulai dengan loading
     try {
       const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (!storedUser) return;
+      if (!storedUser) {
+        // Jika tidak login, tampilkan HANYA dummy order
+        setOrders([dummyOrder]);
+        setLoading(false);
+        return;
+      }
 
-      // ✅ Fetch real orders dari backend
+      // 1. Ambil data asli dari backend
       const res = await fetch(`http://localhost:5000/api/orders/${storedUser.id}`);
-      const data = await res.json();
-      setOrders(data);
+      const realOrders = await res.json();
+      
+      // 2. GABUNGKAN dummy order + data asli
+      setOrders([dummyOrder, ...realOrders]);
+      
       setLoading(false);
     } catch (err) {
       console.error("❌ Error saat fetch orders:", err);
+      // Jika fetch GAGAL, tampilkan HANYA dummy order
+      setOrders([dummyOrder]);
       setLoading(false);
     }
   };
 
   fetchOrders();
-}, [localStorage.getItem("lastOrder")]);
+}, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
