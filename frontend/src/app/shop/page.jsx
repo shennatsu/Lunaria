@@ -4,6 +4,7 @@ import Select from "react-select";
 import Image from "next/image";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { MobileMenu } from '../components/MobileMenu'
 import FlowerPopup from "../components/flowerpopup";
 import CartDrawer from "../components/cartdrawer";
 import { DM_Sans, Libre_Caslon_Display } from "next/font/google";
@@ -43,7 +44,6 @@ export default function ShopPage() {
     setIsClient(true);
   }, []);
 
-  const [setMenuOpen] = useState(false);
   const [activeSection] = useState("shop");
 
   const [selectedSeason, setSelectedSeason] = useState("Spring");
@@ -56,6 +56,7 @@ export default function ShopPage() {
   const [error, setError] = useState(null);
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setCartOpen] = useState(false);
+   const [isMenuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!isClient) return;
@@ -473,6 +474,14 @@ export default function ShopPage() {
               onRemove={(id) =>
                 setCartItems((prev) => prev.filter((item) => item.id !== id))
               }
+            />
+          )}
+
+          {isMenuOpen && (
+            <MobileMenu
+              isOpen={isMenuOpen}
+              setMenuOpen={setMenuOpen}
+              activeSection={activeSection}
             />
           )}
 
