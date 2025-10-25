@@ -20,6 +20,12 @@ export default function Home() {
   const [initialized, setInitialized] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
 
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => setShowIntro(false), 2500); // tampil 2.5 detik
     return () => clearTimeout(timer);
@@ -45,35 +51,34 @@ export default function Home() {
   }, [cartItems, initialized]);
 
   useEffect(() => {
-    // --- PERBAIKAN LOGIKA CEK LOGIN ---
-    console.log("Homepage useEffect running...");
-    let loggedInStatus = false; // Defaultnya false
-    try {
-        const userString = localStorage.getItem('user');
-        console.log("Raw user data from localStorage:", userString);
-        // Cek apakah stringnya ada DAN bukan string 'undefined'/'null'
-        if (userString && userString !== 'undefined' && userString !== 'null') {
-            const userData = JSON.parse(userString);
-            // Pastikan hasil parse adalah objek (bukan null/undefined/error)
-            if (userData && typeof userData === 'object') {
-                 loggedInStatus = true; // Baru set true jika valid
-            }
-        }
-    } catch (error) {
-        console.error("Error checking login status:", error);
-        // Biarkan loggedInStatus false jika ada error
-        localStorage.removeItem('user'); // Hapus item yg error
-    }
-    setIsLoggedIn(loggedInStatus);
-    console.log("isLoggedIn state set to:", loggedInStatus);
-    // --- AKHIR PERBAIKAN ---
+    if (!isClient) return; // pastikan sudah di client
 
-    // Setup scrollspy (TETAP SAMA)
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser && parsedUser.email) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (err) {
+        console.error("Error parsing user:", err);
+        setIsLoggedIn(false);
+        localStorage.removeItem("user");
+      }
+    } else {
+      setIsLoggedIn(false);
+    }
+
+    if (!isClient) return null;
+
+    // scrollspy logic tetap di sini
     const handleScroll = () => {
-      const homeSection = document.getElementById('home')
-      const postcardSection = document.getElementById('postcard')
-      const contactSection = document.getElementById('contact')
-      const scrollPosition = window.scrollY + 120
+      const homeSection = document.getElementById('home');
+      const postcardSection = document.getElementById('postcard');
+      const contactSection = document.getElementById('contact');
+      const scrollPosition = window.scrollY + 120;
       const atBottom = window.scrollY + window.innerHeight >= document.body.offsetHeight - 20;
 
       if (atBottom && contactSection) {
@@ -85,11 +90,12 @@ export default function Home() {
       } else {
         setActiveSection('home');
       }
-    }
+    };
     window.addEventListener('scroll', handleScroll);
     handleScroll();
-    return () => { window.removeEventListener('scroll', handleScroll); };
-  }, []); // Dependency array [] -> hanya jalan sekali saat mount
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isClient]);
+
 
   if (showIntro)
   return (

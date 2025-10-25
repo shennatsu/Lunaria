@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import { X, Loader2 } from "lucide-react";
-import Image from "next/image";
+import { X, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { DM_Sans } from "next/font/google";
+import LoginRequiredModal from "./LoginRequiredModal";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -10,75 +10,113 @@ const dmSans = DM_Sans({
   variable: "--font-dm",
 });
 
-export default function PaymentPopup({ total, cartItems, onClose, onConfirm }) {
+function MessagePopup({ type = "success", message, onClose }) {
+  const isSuccess = type === "success";
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+      <div className="bg-white rounded-2xl shadow-xl p-6 w-[85%] sm:w-[360px] text-center animate-fadeIn">
+        <div className="flex justify-center mb-3">
+          {isSuccess ? (
+            <CheckCircle2 className="text-green-500 w-12 h-12" />
+          ) : (
+            <XCircle className="text-red-500 w-12 h-12" />
+          )}
+        </div>
+        <p className="text-gray-700 font-medium mb-5">{message}</p>
+        <button
+          onClick={onClose}
+          className={`px-5 py-2 rounded-lg text-white font-semibold transition ${
+            isSuccess
+              ? "bg-green-500 hover:bg-green-600"
+              : "bg-red-500 hover:bg-red-600"
+          }`}
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function PaymentPopup({ total, cartItems = [], onClose, onConfirm }) {
   const [method, setMethod] = useState("credit");
   const [loading, setLoading] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [popup, setPopup] = useState({ show: false, type: "success", message: "" });
 
   const handlePay = async () => {
     setLoading(true);
 
     try {
-      // Simulasi payment process
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Ambil user dari localStorage
-      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const storedUser = JSON.parse(localStorage.getItem("user"));
       if (!storedUser) {
-        alert("Silakan login terlebih dahulu!");
+        setShowLoginModal(true);
         setLoading(false);
         return;
       }
 
-      // Siapkan data order
+      // Simulasi delay payment
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       const orderData = {
         userId: storedUser.id,
-        items: cartItems.map(item => ({
+        items: cartItems.map((item) => ({
           name: item.name,
           qty: item.qty,
           price: item.price,
-          to: item.to || '',
-          message: item.message || '',
-          isPublic: item.isPublic || false
+          to: item.to || "",
+          message: item.message || "",
+          isPublic: item.isPublic || false,
         })),
-        total: total,
-        shippingAddress: storedUser.address || 'Alamat belum diisi',
-        paymentMethod: method
+        total,
+        shippingAddress: storedUser.address || "Alamat belum diisi",
+        paymentMethod: method,
       };
 
-      // Kirim order ke backend
-      const response = await fetch('http://localhost:5000/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
+      const response = await fetch("http://localhost:5000/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
       });
 
-      if (!response.ok) {
-        throw new Error('Gagal membuat order');
-      }
+      if (!response.ok) throw new Error("Gagal membuat order");
 
       const result = await response.json();
-      console.log("✅ Order created:", result);
 
-      alert(`Payment successful!\nOrder ID: ${result.order.id}`);
-      
-      // Clear cart setelah payment sukses
+      // Popup sukses gantikan alert
+      setPopup({
+        show: true,
+        type: "success",
+        message: `Pembayaran berhasil!\nOrder ID: ${result.order.id}`,
+      });
+
+      // Kosongkan keranjang
       const cartKey = `cart_${storedUser.email}`;
       localStorage.removeItem(cartKey);
 
       setLoading(false);
-      onConfirm(); // Close popup dan refresh
     } catch (error) {
       console.error("❌ Payment error:", error);
-      alert("Payment failed. Please try again.");
+      // Popup error gantikan alert
+      setPopup({
+        show: true,
+        type: "error",
+        message: "Payment failed. Please try again.",
+      });
       setLoading(false);
     }
+  };
+
+  const handlePopupClose = () => {
+    setPopup({ show: false, type: "success", message: "" });
+    if (popup.type === "success") onConfirm(); // hanya tutup semua jika berhasil
   };
 
   return (
     <div
       className={`${dmSans.className} fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm`}
     >
-      <div className="bg-white w-[90%] sm:w-[420px] rounded-2xl shadow-lg overflow-hidden animate-fade-in">
+      <div className="bg-white w-[90%] sm:w-[420px] rounded-2xl shadow-lg overflow-hidden animate-fade-in relative">
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-lg font-semibold">Payment Method</h2>
@@ -111,12 +149,14 @@ export default function PaymentPopup({ total, cartItems, onClose, onConfirm }) {
           </button>
         </div>
 
-        {/* Form Section */}
+        {/* Form */}
         <div className="p-5">
           {method === "credit" ? (
             <form className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Cardholder Name</label>
+                <label className="block text-sm font-medium mb-1">
+                  Cardholder Name
+                </label>
                 <input
                   type="text"
                   placeholder="John Doe"
@@ -159,7 +199,6 @@ export default function PaymentPopup({ total, cartItems, onClose, onConfirm }) {
               <p className="text-gray-600 text-center text-sm mb-4">
                 You will be redirected to PayPal to complete your purchase securely.
               </p>
-
               {loading && (
                 <div className="flex items-center gap-2 text-[#987772]">
                   <Loader2 className="animate-spin" size={18} />
@@ -174,7 +213,9 @@ export default function PaymentPopup({ total, cartItems, onClose, onConfirm }) {
         <div className="border-t p-4">
           <div className="flex justify-between mb-3">
             <p className="font-medium">Total:</p>
-            <p className="font-semibold text-lg">Rp {total.toLocaleString("id-ID")}</p>
+            <p className="font-semibold text-lg">
+              Rp {total.toLocaleString("id-ID")}
+            </p>
           </div>
 
           <button
@@ -190,13 +231,20 @@ export default function PaymentPopup({ total, cartItems, onClose, onConfirm }) {
               ? "Pay with Credit Card"
               : "Pay with PayPal"}
           </button>
-
-          {method === "paypal" && !loading && (
-            <p className="text-center text-gray-500 text-xs mt-2">
-              You'll be redirected to PayPal for secure checkout.
-            </p>
-          )}
         </div>
+
+        {/* Modal login & popup cantik */}
+        <LoginRequiredModal
+          show={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+        />
+        {popup.show && (
+          <MessagePopup
+            type={popup.type}
+            message={popup.message}
+            onClose={handlePopupClose}
+          />
+        )}
       </div>
     </div>
   );

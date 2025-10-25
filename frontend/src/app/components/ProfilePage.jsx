@@ -1,10 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { User, Phone, MapPin, LogOut, ChevronDown, ChevronUp, Home } from 'lucide-react';
+import { User, Phone, MapPin, LogOut, ChevronDown, ChevronUp, Home, CheckCircle2, XCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { DM_Sans } from "next/font/google";
-
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -23,6 +22,35 @@ const dummyOrder = {
   shippingAddress: 'Jl. Juri Lomba Frontend No. 1, Jakarta'
 };
 
+// Komponen popup
+function MessagePopup({ type = "success", message, onClose }) {
+  const isSuccess = type === "success";
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] animate-fadeIn">
+      <div className="bg-white rounded-2xl shadow-xl p-6 w-[85%] sm:w-[360px] text-center">
+        <div className="flex justify-center mb-3">
+          {isSuccess ? (
+            <CheckCircle2 className="text-green-500 w-12 h-12" />
+          ) : (
+            <XCircle className="text-red-500 w-12 h-12" />
+          )}
+        </div>
+        <p className="text-gray-700 font-medium mb-5 whitespace-pre-line">{message}</p>
+        <button
+          onClick={onClose}
+          className={`px-5 py-2 rounded-lg text-white font-semibold transition ${
+            isSuccess
+              ? "bg-green-500 hover:bg-green-600"
+              : "bg-red-500 hover:bg-red-600"
+          }`}
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('userInfo');
@@ -35,7 +63,7 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState([]);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [popup, setPopup] = useState({ show: false, type: "success", message: "" }); // popup state
 
   const handleChange = (e) => {
     setFormData({
@@ -59,7 +87,6 @@ export default function ProfilePage() {
       try {
         const storedUser = JSON.parse(localStorage.getItem('user'));
         if (!storedUser) {
-          console.error("User belum login!");
           router.push('/login');
           return;
         }
@@ -81,37 +108,31 @@ export default function ProfilePage() {
     fetchProfile();
   }, [router]);
 
-// Fetch orders data
-useEffect(() => {
-  const fetchOrders = async () => {
-    setLoading(true); // Selalu mulai dengan loading
-    try {
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (!storedUser) {
-        // Jika tidak login, tampilkan HANYA dummy order
+  // Fetch orders data
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setLoading(true);
+      try {
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        if (!storedUser) {
+          setOrders([dummyOrder]);
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(`http://localhost:5000/api/orders/${storedUser.id}`);
+        const realOrders = await res.json();
+        setOrders([dummyOrder, ...realOrders]);
+        setLoading(false);
+      } catch (err) {
+        console.error("❌ Error saat fetch orders:", err);
         setOrders([dummyOrder]);
         setLoading(false);
-        return;
       }
+    };
 
-      // 1. Ambil data asli dari backend
-      const res = await fetch(`http://localhost:5000/api/orders/${storedUser.id}`);
-      const realOrders = await res.json();
-      
-      // 2. GABUNGKAN dummy order + data asli
-      setOrders([dummyOrder, ...realOrders]);
-      
-      setLoading(false);
-    } catch (err) {
-      console.error("❌ Error saat fetch orders:", err);
-      // Jika fetch GAGAL, tampilkan HANYA dummy order
-      setOrders([dummyOrder]);
-      setLoading(false);
-    }
-  };
-
-  fetchOrders();
-}, []);
+    fetchOrders();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -119,7 +140,7 @@ useEffect(() => {
     try {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       if (!storedUser) {
-        console.error("Kamu belum login!");
+        setPopup({ show: true, type: "error", message: "Kamu belum login!" });
         return;
       }
 
@@ -129,16 +150,15 @@ useEffect(() => {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        throw new Error(`Gagal update: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Gagal update: ${response.status}`);
 
       const data = await response.json();
       console.log("✅ Response dari backend:", data);
-      alert("Profil berhasil diperbarui!");
+
+      setPopup({ show: true, type: "success", message: "Profil berhasil diperbarui!" });
     } catch (err) {
       console.error("❌ Error saat update profil:", err);
-      alert("Gagal memperbarui profil!");
+      setPopup({ show: true, type: "error", message: "Gagal memperbarui profil!" });
     }
   };
 
@@ -153,8 +173,8 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFDAF5] via-[#E9B6C2] to-[#E1688B] p-6">
-      {/* Home Icon - Top Left */}
+    <div className={`${dmSans.className} min-h-screen bg-gradient-to-br from-[#FFDAF5] via-[#E9B6C2] to-[#E1688B] p-6`}>
+      {/* Home Icon */}
       {typeof window !== "undefined" && localStorage.getItem("user") && (
         <div className="fixed top-6 left-6 z-50">
           <button
@@ -189,7 +209,7 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Main */}
       <div className="max-w-7xl mx-auto">
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden">
           {/* Tabs */}
@@ -216,13 +236,14 @@ useEffect(() => {
             </button>
           </div>
 
-          {/* Tab Content */}
+          {/* Content */}
           <div className="p-8">
             {activeTab === 'userInfo' && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 mb-8">Dashboard</h2>
                 
                 <div className="space-y-6">
+                  {/* Form fields */}
                   <div>
                     <label className="flex items-center gap-2 text-gray-700 font-semibold mb-3">
                       <User className="w-5 h-5 text-pink-500" />
@@ -233,7 +254,7 @@ useEffect(() => {
                       name="username"
                       value={formData.username}
                       onChange={handleChange}
-                      className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl text-base transition-all duration-300 bg-white focus:outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100"
+                      className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100"
                       placeholder="Masukkan username"
                     />
                   </div>
@@ -248,7 +269,7 @@ useEffect(() => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl text-base transition-all duration-300 bg-white focus:outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100"
+                      className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100"
                       placeholder="08xxxxxxxxxx"
                     />
                   </div>
@@ -263,17 +284,16 @@ useEffect(() => {
                       value={formData.address}
                       onChange={handleChange}
                       rows="4"
-                      className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl text-base transition-all duration-300 bg-white focus:outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100 resize-none"
+                      className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100 resize-none"
                       placeholder="Masukkan alamat lengkap Anda"
                     />
                   </div>
 
                   <button
                     onClick={handleSubmit}
-                    className="w-full py-4 bg-gradient-to-r from-pink-400 to-pink-600 text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-gradient-to-r from-pink-400 to-pink-600 text-white rounded-xl font-bold text-lg shadow-lg hover:scale-[1.02] transition-all"
                   >
-                    <span>💾</span>
-                    Simpan Perubahan
+                    💾 Simpan Perubahan
                   </button>
                 </div>
               </div>
@@ -366,6 +386,15 @@ useEffect(() => {
           </div>
         </div>
       </div>
+
+      {/* Popup muncul di atas semua */}
+      {popup.show && (
+        <MessagePopup
+          type={popup.type}
+          message={popup.message}
+          onClose={() => setPopup({ show: false, type: "success", message: "" })}
+        />
+      )}
     </div>
   );
 }

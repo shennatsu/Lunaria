@@ -34,7 +34,15 @@ const availabilityOptions = [
   { value: "unavailable", label: "Out of Stock" },
 ];
 
+
 export default function ShopPage() {
+  const [isClient, setIsClient] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const [setMenuOpen] = useState(false);
   const [activeSection] = useState("shop");
 
@@ -50,19 +58,31 @@ export default function ShopPage() {
   const [isCartOpen, setCartOpen] = useState(false);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const cartKey = user ? `cart_${user.email}` : "cart_guest";
+    if (!isClient) return;
 
-    const saved = localStorage.getItem(cartKey);
-    if (saved) setCartItems(JSON.parse(saved));
-  }, []);
+    try {
+      const storedUser = localStorage.getItem("user");
+      const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+      setUser(parsedUser);
+
+      const cartKey = parsedUser ? `cart_${parsedUser.email}` : "cart_guest";
+      const savedCart = localStorage.getItem(cartKey);
+      if (savedCart) {
+        setCartItems(JSON.parse(savedCart));
+      }
+    } catch (err) {
+      console.error("Error loading user/cart:", err);
+      localStorage.removeItem("user");
+    }
+  }, [isClient]);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const cartKey = user ? `cart_${user.email}` : "cart_guest";
-
+    if (!isClient) return;
+    const storedUser = localStorage.getItem("user");
+    const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+    const cartKey = parsedUser ? `cart_${parsedUser.email}` : "cart_guest";
     localStorage.setItem(cartKey, JSON.stringify(cartItems));
-  }, [cartItems]);
+  }, [cartItems, isClient]);
 
   // Tambah ke keranjang
   const handleAddToCart = (flower) => {
@@ -108,6 +128,8 @@ export default function ShopPage() {
     fetchFlowers();
   }, []);
 
+  if (!isClient) return null;
+
   if (loading)
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#FFF7FC] to-[#FCE4EC] relative overflow-hidden">
@@ -151,23 +173,24 @@ export default function ShopPage() {
       .includes(searchTerm.toLowerCase());
     const matchesAvailability =
       availabilityFilter === "available"
-        ? flower.status_tersedia
+        ? flower.status
         : availabilityFilter === "unavailable"
-        ? !flower.status_tersedia
+        ? !flower.status
         : true;
     return matchesSeason && matchesSearch && matchesAvailability;
   });
 
   if (sortOption === "harga-asc") filteredFlowers.sort((a, b) => a.price - b.price);
   else if (sortOption === "harga-desc") filteredFlowers.sort((a, b) => b.price - a.price);
-  else if (sortOption === "umur-asc") filteredFlowers.sort((a, b) => a.umur_tahan - b.umur_tahan);
-  else if (sortOption === "umur-desc") filteredFlowers.sort((a, b) => b.umur_tahan - a.umur_tahan);
+  else if (sortOption === "umur-asc") filteredFlowers.sort((a, b) => a.lifespan - b.lifespan);
+  else if (sortOption === "umur-desc") filteredFlowers.sort((a, b) => b.lifespan - a.lifespan);
 
   return (
     <div className={`${dmSans.variable} font-dm flex flex-col min-h-screen bg-[#fff8f7]`}>
       <Header
         setMenuOpen={setMenuOpen}
         activeSection={activeSection}
+        isLoggedIn={!!user}
         onCartClick={() => setCartOpen(true)}
       />
 
@@ -376,7 +399,7 @@ export default function ShopPage() {
           {/* Grid bunga */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10 justify-items-center mb-14 px-4 sm:px-12 md:px-20">
             {filteredFlowers.map((flower) => {
-              const isAvailable = flower.status_tersedia;
+              const isAvailable = flower.status;
               return (
                 <div
                   key={flower.id}

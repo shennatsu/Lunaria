@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-// import { useRouter } from 'next/navigation'; // Dihapus karena menyebabkan error di lingkungan non-Next.js
+import { useRouter } from 'next/navigation';
 
 // Icon untuk pesan notifikasi (inline SVG)
 const CheckCircleIcon = () => (
@@ -55,7 +55,7 @@ function Notification({ message, type, onClose }) {
 
 
 export default function LoginPage() {
-  // const router = useRouter(); // Dihapus, akan diganti dengan API browser standar
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -88,12 +88,12 @@ export default function LoginPage() {
         
         // Simpan user data ke localStorage
         localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('isLoggedIn', 'true');
         
         // Redirect ke profile atau home setelah 2 detik
         setTimeout(() => {
-          // router.push('/profile'); // Diganti dengan API web standar
-          window.location.assign('/');
-        }, 2000);
+          router.push('/'); // pindah tanpa reload penuh
+        }, 1000);
       }
     } catch (err) {
       console.error(err);

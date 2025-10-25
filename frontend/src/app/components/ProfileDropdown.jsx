@@ -5,6 +5,7 @@ import { LogOut, User, LogIn, UserPlus } from 'lucide-react';
 // Fungsi logout
 const handleLogout = () => {
   localStorage.removeItem('user');
+  localStorage.removeItem('isLoggedIn');
   window.location.assign('/');
 };
 
