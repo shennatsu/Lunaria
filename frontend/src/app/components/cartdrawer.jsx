@@ -188,7 +188,6 @@ export default function CartDrawer({ cartItems, onClose, onUpdateQty, onRemove }
           cartItems={cartItems}
           onClose={() => setShowPayment(false)}
           onConfirm={() => {
-            alert("Payment successful!");
             setShowPayment(false);
             onClose();
            router.push('/profile');

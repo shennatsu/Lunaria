@@ -1,14 +1,63 @@
-// src/app/page.js
 "use client"
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-// IMPORT KOMPONEN
 import { Header } from './components/Header'
 import { MobileMenu } from './components/MobileMenu'
 import { PostcardScroller } from './components/Scroller'
-import { Footer } from './components/Footer' // Pastikan Footer diimport
+import { Footer } from './components/Footer' 
 import CartDrawer from "./components/cartdrawer";
+
+const pixelFlowerImages = [
+  '/pixel-rose.png', 
+  '/pixel-sunflower.png',
+  '/pixel-tulip.png',
+  '/pixel-lily.png',
+  '/pixel-hibiscus.png',
+  '/pixel-daisy.png',
+  '/pixel-sakura.png',
+  '/pixel-lavender.png',
+  '/pixel-orchid.png',
+];
+
+const getRandomFlowerImage = () => {
+  const randomIndex = Math.floor(Math.random() * pixelFlowerImages.length);
+  return pixelFlowerImages[randomIndex];
+};
+
+const cardDataBase = [ // Data dasar tanpa gambar bunga
+  { id: 1, to: 'Jane Doe', from: 'John Doe', message: "Thinking of you today! Hope you're having a wonderful day." },
+  { id: 2, to: 'Alex', from: 'Sarah', message: "Just wanted to send a little sunshine your way. Keep shining!" },
+  { id: 3, to: 'Mom', from: 'The Kids', message: "We love you more than words can say! Thanks for everything." },
+  { id: 4, to: 'Bestie', from: 'Your #1 Fan', message: "Remember that time...? Haha! Miss you loads, let's catch up soon." },
+  { id: 5, to: 'Michael', from: 'Emily', message: "Wishing you all the best on your new adventure! Go get 'em!" },
+  { id: 6, to: 'Luna', from: 'Leo', message: "Saw this and thought of you. Hope it brings a smile to your face." },
+  { id: 7, to: 'Grandma', from: 'Your Fav', message: "Sending you lots of love and hugs from afar! Stay warm." },
+  { id: 8, to: 'Mr. Smith', from: 'Class 5B', message: "Thank you for being such an inspiring teacher! We appreciate you." },
+  { id: 9, to: 'David', from: 'Chloe', message: "Happy Birthday! Hope you have a fantastic day filled with joy." },
+  { id: 10, to: 'The Team', from: 'The Boss', message: "Great job on the project! Your hard work is truly valued." },
+  { id: 11, to: 'My Love', from: 'Secret Admirer', message: "Just a little note to say you're always on my mind." },
+  { id: 12, to: 'Future Me', from: 'Past Me', message: "Don't forget to stop and smell the roses sometimes. You got this!" },
+];
+
+function shuffleArray(array) {
+  let currentIndex = array.length, randomIndex;
+  const newArray = [...array]; 
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [newArray[currentIndex], newArray[randomIndex]] = [
+      newArray[randomIndex], newArray[currentIndex]];
+  }
+  return newArray;
+}
+
+const createCardData = (baseData) => {
+    return baseData.map(card => ({
+        ...card,
+        flowerImage: getRandomFlowerImage()
+    }));
+};
 
 // ----- HALAMAN UTAMA -----
 export default function Home() {
@@ -20,8 +69,23 @@ export default function Home() {
   const [initialized, setInitialized] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
 
+  const [isClient, setIsClient] = useState(false);
+
+  const [originalCards, setOriginalCards] = useState([]);
+  const [shuffledCards, setShuffledCards] = useState([]);
+
   useEffect(() => {
-    const timer = setTimeout(() => setShowIntro(false), 2500); // tampil 2.5 detik
+    const initialCards = createCardData(cardDataBase);
+    setOriginalCards(initialCards);
+    setShuffledCards(shuffleArray(initialCards));
+  }, []);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowIntro(false), 2500); 
     return () => clearTimeout(timer);
   }, []);
 
@@ -32,12 +96,11 @@ export default function Home() {
     const saved = localStorage.getItem(cartKey);
     if (saved) setCartItems(JSON.parse(saved));
 
-    setInitialized(true); // <--- tandai bahwa cart sudah diload
+    setInitialized(true); 
   }, []);
 
   useEffect(() => {
-    if (!initialized) return; // <--- cegah overwrite sebelum load selesai
-
+    if (!initialized) return; 
     const user = JSON.parse(localStorage.getItem("user"));
     const cartKey = user ? `cart_${user.email}` : "cart_guest";
 
@@ -45,35 +108,33 @@ export default function Home() {
   }, [cartItems, initialized]);
 
   useEffect(() => {
-    // --- PERBAIKAN LOGIKA CEK LOGIN ---
-    console.log("Homepage useEffect running...");
-    let loggedInStatus = false; // Defaultnya false
-    try {
-        const userString = localStorage.getItem('user');
-        console.log("Raw user data from localStorage:", userString);
-        // Cek apakah stringnya ada DAN bukan string 'undefined'/'null'
-        if (userString && userString !== 'undefined' && userString !== 'null') {
-            const userData = JSON.parse(userString);
-            // Pastikan hasil parse adalah objek (bukan null/undefined/error)
-            if (userData && typeof userData === 'object') {
-                 loggedInStatus = true; // Baru set true jika valid
-            }
-        }
-    } catch (error) {
-        console.error("Error checking login status:", error);
-        // Biarkan loggedInStatus false jika ada error
-        localStorage.removeItem('user'); // Hapus item yg error
-    }
-    setIsLoggedIn(loggedInStatus);
-    console.log("isLoggedIn state set to:", loggedInStatus);
-    // --- AKHIR PERBAIKAN ---
+    if (!isClient) return; 
 
-    // Setup scrollspy (TETAP SAMA)
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser && parsedUser.email) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (err) {
+        console.error("Error parsing user:", err);
+        setIsLoggedIn(false);
+        localStorage.removeItem("user");
+      }
+    } else {
+      setIsLoggedIn(false);
+    }
+
+    if (!isClient) return null;
+
     const handleScroll = () => {
-      const homeSection = document.getElementById('home')
-      const postcardSection = document.getElementById('postcard')
-      const contactSection = document.getElementById('contact')
-      const scrollPosition = window.scrollY + 120
+      const homeSection = document.getElementById('home');
+      const postcardSection = document.getElementById('postcard');
+      const contactSection = document.getElementById('contact');
+      const scrollPosition = window.scrollY + 120;
       const atBottom = window.scrollY + window.innerHeight >= document.body.offsetHeight - 20;
 
       if (atBottom && contactSection) {
@@ -85,16 +146,16 @@ export default function Home() {
       } else {
         setActiveSection('home');
       }
-    }
+    };
     window.addEventListener('scroll', handleScroll);
     handleScroll();
-    return () => { window.removeEventListener('scroll', handleScroll); };
-  }, []); // Dependency array [] -> hanya jalan sekali saat mount
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isClient]);
+
 
   if (showIntro)
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#FFF7FC] to-[#FCE4EC] overflow-hidden relative">
-      {/* Background bunga lembut */}
       <div className="absolute inset-0 opacity-30">
         <Image
           src="/lily.png"
@@ -126,7 +187,7 @@ export default function Home() {
 
 
   return (
-    <> {/* Fragment agar Footer bisa di luar main */}
+    <> 
       <main
         className={`relative min-h-screen overflow-x-hidden z-10
           ${isMenuOpen ? 'overflow-hidden' : ''}
@@ -141,8 +202,9 @@ export default function Home() {
         <Header
           setMenuOpen={setMenuOpen}
           activeSection={activeSection}
-          isLoggedIn={isLoggedIn} // Kirim status login
+          isLoggedIn={isLoggedIn} 
           onCartClick={() => setCartOpen(true)}
+          isMenuOpen={isMenuOpen} 
         />
 
         {/* Gambar Bunga Lily */}
@@ -174,12 +236,14 @@ export default function Home() {
             your day.
           </p>
           <div className="flex flex-row flex-wrap gap-5 mt-12 font-dm font-medium justify-center lg:justify-start">
-            <button className="px-10 py-3 text-base bg-button-bg rounded-2xl text-black">
+            <a 
+            href="/shop"
+            className="px-10 py-3 text-base bg-button-bg rounded-2xl text-black transition-transform duration-300 ease-out shadow-md hover:shadow-lg hover:-translate-y-1">
               Our Product
-            </button>
+            </a>
             <a 
             href="#contact" 
-            className="px-10 py-3 text-base bg-button-bg rounded-2xl text-black text-center" // Tambah text-center biar mirip button
+            className="px-10 py-3 text-base bg-button-bg rounded-2xl text-black text-center transition-transform duration-300 ease-out shadow-md hover:shadow-lg hover:-translate-y-1"
            >
               Our Contact
             </a>
@@ -191,10 +255,10 @@ export default function Home() {
           id="postcard"
           className="relative flex flex-col gap-8 mt-32 lg:mt-48 py-10 scroll-m-24 lg:scroll-m-28"
         >
-          <PostcardScroller direction="left" />
-          <PostcardScroller direction="right" />
+          <PostcardScroller direction="left" cards={originalCards} />
+          <PostcardScroller direction="right" cards={shuffledCards} />
         </section>
-          <Footer /> {/* Footer di luar main */}
+          <Footer /> 
 
           {isCartOpen && (
           <CartDrawer

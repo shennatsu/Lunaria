@@ -28,8 +28,8 @@ module.exports = {
         'float2': 'float2 5s ease-in-out infinite',
         'float3': 'float3 7s ease-in-out infinite',
         'rotate': 'rotate 20s linear infinite',
-        'scroll-left': 'scroll-left 40s linear infinite',
-        'scroll-right': 'scroll-right 40s linear infinite',
+        'scroll-left': 'scroll-left 70s linear infinite',
+        'scroll-right': 'scroll-right 70s linear infinite',
       },
       keyframes: {
         fadeIn: {
