@@ -1,22 +1,18 @@
-// src/app/components/Footer.js
-"use client"; // Tambahkan ini karena kita pakai hook
+"use client"; 
 
-import { useState, useEffect } from 'react'; // <-- Import hook
+import { useState, useEffect } from 'react'; 
 import { BsInstagram, BsPinterest, BsTwitter } from 'react-icons/bs';
 import Image from 'next/image';
 
 export function Footer() {
-  // State untuk menyimpan tahun, awalnya kosong
   const [currentYear, setCurrentYear] = useState('');
 
-  // Effect untuk set tahun HANYA di client setelah mount
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
      }, []);   
     return (
     <footer
       id="contact"
-      // overflow-hidden SANGAT PENTING di sini
       className="relative w-full py-20 px-6 bg-transparent mt-40 scroll-m-32 lg:scroll-m-40 overflow-hidden"
     >
       {/* BUNGA KIRI (Bouquet 1) */}
@@ -39,7 +35,6 @@ export function Footer() {
         />
       </div>
 
-      {/* Konten Footer (tetap di z-10) */}
       <div className="relative max-w-4xl mx-auto flex flex-col items-center gap-8 z-10">
         {/* 1. Brand Name */}
         <h2 className="font-caslon text-5xl tracking-[0.1em] text-center">
