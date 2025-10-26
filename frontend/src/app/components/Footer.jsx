@@ -43,16 +43,16 @@ export function Footer() {
 
         {/* 2. Nav Links */}
         <nav className="flex flex-wrap justify-center gap-x-8 gap-y-2 font-dm text-base text-black/80">
-          <a href="#home" className="hover:text-black transition-colors">
+          <a href="/#home" className="hover:text-black transition-colors">
             Home
           </a>
-          <a href="#" className="hover:text-black transition-colors">
+          <a href="/shop" className="hover:text-black transition-colors">
             Shop
           </a>
-          <a href="#postcard" className="hover:text-black transition-colors">
+          <a href="/#postcard" className="hover:text-black transition-colors">
             Postcard
           </a>
-          <a href="#contact" className="hover:text-black transition-colors">
+          <a href="/#contact" className="hover:text-black transition-colors">
             Contact
           </a>
         </nav>
