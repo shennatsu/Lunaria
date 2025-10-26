@@ -1,20 +1,6 @@
-import express from "express";
-import cors from "cors";
-import registerRoute from "./routes/register.js";
-import profileRoute from "./routes/profile.js";
-import loginRoutes from "./routes/login.js";
+import app from "./server.js";
 
-const app = express();
-const PORT = 5000;
-
-app.use(cors());
-app.use(express.json());
-
-// Route
-app.use("/api/register", registerRoute);
-app.use("/api/profile", profileRoute);
-app.use("/api/login", loginRoutes);
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+export default function handler(req, res) {
+  // Jalankan Express app di mode Vercel (Serverless)
+  return app(req, res);
+}
