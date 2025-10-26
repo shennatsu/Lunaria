@@ -48,8 +48,10 @@ export default function FlowerPopup({
   };
 
   return (
-    <div className={`${dmSans.className} fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-3 sm:px-0`}>
-      <div className="bg-[#fff8f7] rounded-2xl p-5 sm:p-6 w-full max-w-4xl shadow-2xl relative flex flex-col max-h-[90vh] sm:max-h-none overflow-hidden sm:overflow-visible">
+    <div
+      className={`${dmSans.className} fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-3 sm:px-0`}
+    >
+      <div className="bg-[#fff8f7] rounded-2xl p-5 sm:p-6 w-full max-w-4xl shadow-2xl relative flex flex-col max-h-[90vh] overflow-hidden">
         {/* Tombol close */}
         <button
           onClick={onClose}
@@ -59,7 +61,7 @@ export default function FlowerPopup({
         </button>
 
         {/* Konten scrollable */}
-        <div className="flex-1 overflow-y-auto sm:overflow-visible">
+        <div className="flex-1 overflow-y-auto pr-1 sm:pr-3">
           <div className="flex flex-col md:flex-row gap-6 md:gap-8 mt-8 sm:ml-5">
             {/* Bagian gambar */}
             <div className="flex flex-col gap-4 items-center md:mr-7 flex-shrink-0">
@@ -98,8 +100,7 @@ export default function FlowerPopup({
             </div>
 
             {/* Detail produk */}
-            <div className="flex-1 text-[#451900] flex flex-col">
-              {/* ⤵ Nama bunga tetap font serif */}
+            <div className="flex-1 text-[#451900] flex flex-col pb-24 md:pb-0">
               <h2 className="text-2xl sm:text-3xl font-serif mb-2 text-center md:text-left">
                 {flower.name}
               </h2>
@@ -163,7 +164,6 @@ export default function FlowerPopup({
                                 height={80}
                                 className="mx-auto rounded-md"
                               />
-                              {/* Nama kombinasi tetap font serif */}
                               <p className="text-sm mt-1 truncate font-serif">
                                 {comboFlower.name}
                               </p>
@@ -188,31 +188,31 @@ export default function FlowerPopup({
                   )}
                 </div>
               </div>
-
-              {/* Tombol aksi */}
-              <div className="bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.1)] border-t border-gray-300 mt-5 pt-3 pb-4 px-5 flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4 sm:bg-transparent sm:shadow-none sm:border-none sm:pt-0 sm:pb-0 sm:mt-6 sm:px-0">
-                <button
-                  onClick={() => {
-                    if (!isLoggedIn) {
-                      setShowLoginModal(true);
-                      return;
-                    }
-                    handleAddClick();
-                  }}
-                  className="bg-white border border-[#451900] text-[#451900] rounded-xl px-4 py-2 flex items-center justify-center gap-2 hover:bg-[#987772] hover:text-[#451900] transition"
-                >
-                  Add to Cart
-                </button>
-
-                <button
-                  onClick={() => setShowPayment(true)}
-                  className="bg-[#451900] text-white px-6 py-2 rounded-xl shadow hover:bg-[#987772] hover:text-[#451900] transition"
-                >
-                  Buy Now
-                </button>
-              </div>
             </div>
           </div>
+        </div>
+
+        {/* Tombol aksi di bawah (selalu terlihat) */}
+        <div className="sticky bottom-0 left-0 bg-[#fff8f7] border-t border-gray-300 mt-4 pt-3 pb-4 flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4">
+          <button
+            onClick={() => {
+              if (!isLoggedIn) {
+                setShowLoginModal(true);
+                return;
+              }
+              handleAddClick();
+            }}
+            className="bg-white border border-[#451900] text-[#451900] rounded-xl px-4 py-2 flex items-center justify-center gap-2 hover:bg-[#987772] hover:text-[#451900] transition"
+          >
+            Add to Cart
+          </button>
+
+          <button
+            onClick={() => setShowPayment(true)}
+            className="bg-[#451900] text-white px-6 py-2 rounded-xl shadow hover:bg-[#987772] hover:text-[#451900] transition"
+          >
+            Buy Now
+          </button>
         </div>
       </div>
 
@@ -235,7 +235,7 @@ export default function FlowerPopup({
       {showPayment && (
         <PaymentPopup
           total={flower.price * amount}
-          cartItems={[{ ...flower, qty: amount }]}  
+          cartItems={[{ ...flower, qty: amount }]}
           onClose={() => setShowPayment(false)}
           onConfirm={() => {
             setShowPayment(false);
@@ -249,7 +249,6 @@ export default function FlowerPopup({
         show={showLoginModal}
         onClose={() => setShowLoginModal(false)}
       />
-
     </div>
   );
 }
